@@ -1,0 +1,24 @@
+# Compiled source #
+###################
+*.o
+*.so
+*.pyc
+
+# Logs and temporaries #
+########################
+*.log
+*~
+.coverage
+*egg*
+*cache*
+
+# Folders #
+###########
+build/
+dist/
+*cache*
+*.egg*
+
+# Notebook checkpoints #
+########################
+*.ipynb_checkpoints*

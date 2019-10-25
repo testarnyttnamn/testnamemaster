@@ -1,0 +1,33 @@
+# Install dependencies
+before_script:
+  - apt-get update
+  - apt-get upgrade -y
+  - apt-get install software-properties-common -y
+  - add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) main universe restricted multiverse"
+  - apt-get install gfortran -y
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b -p $HOME/miniconda
+  - export PATH=$HOME/miniconda/bin:$PATH
+  - conda env create -f environment.yml
+  - source activate cosmobox
+  - pip install coverage nose pytest pytest-cov
+
+# Install package
+Install:
+  script: python setup.py test
+
+# Build API docs
+pages:
+  script:
+    - source activate cosmobox
+    - pip install sphinx sphinx-rtd-theme numpydoc
+    - mkdir docs/build
+    - sphinx-apidoc -feo docs/source cosmobox
+    - sphinx-build docs/source docs/build
+    - mv docs/build public/
+  artifacts:
+    paths:
+      - public
+  # only:
+  #   - master
