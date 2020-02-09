@@ -6,6 +6,6 @@ Provide some basic description of the cosmo module.
 
 """
 
-__all__ = []  # list submodules
+__all__ = ['estimates']  # list submodules
 
 from . import *
