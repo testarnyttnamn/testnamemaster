@@ -56,8 +56,8 @@ class ShearShear:
             n(z) for ISTF source distribution.
         """
         zm = 0.9
-        z0 = zm/np.sqrt(2.0)
-        n_val = ((z/z0)**2.0) * np.exp((-(z/z0)**1.5))
+        z0 = zm / np.sqrt(2.0)
+        n_val = ((z / z0)**2.0) * np.exp((-(z / z0)**1.5))
         return n_val
 
     def p_phot(self, zp, z):
@@ -87,11 +87,13 @@ class ShearShear:
         sig0 = 0.05
         fout = 0.1
 
-        fac1 = (1.0-fout)/(np.sqrt(2.0*np.pi)*sigb*(1.0+z))
-        fac2 = fout/(np.sqrt(2.0*np.pi)*sig0*(1.0+z))
+        fac1 = (1.0 - fout)/(np.sqrt(2.0 * np.pi) * sigb * (1.0 + z))
+        fac2 = fout / (np.sqrt(2.0 * np.pi) * sig0 * (1.0 + z))
 
-        p_val = ((fac1 * np.exp((-0.5)*((z-(cb*zp)-zb)/(sigb*(1.0+z)))**2.0)) +
-                 (fac2 * np.exp((-0.5)*((z-(c0*zp)-z0)/(sig0*(1.0+z)))**2.0)))
+        p_val = ((fac1 * np.exp((-0.5) * ((z - (cb * zp) -
+                                           zb) / (sigb * (1.0 + z)))**2.0)) +
+                 (fac2 * np.exp((-0.5) * ((z - (c0 * zp) -
+                                           z0)/(sig0 * (1.0 + z)))**2.0)))
 
         return p_val
 
@@ -148,7 +150,7 @@ class ShearShear:
         n_denom = integrate.quad(self._n_phot_int, a=z_list[0],
                                  b=z_list[-1], args=(bin_z_max, bin_z_min))[0]
 
-        res = np.array(n_nums_list)/n_denom
+        res = np.array(n_nums_list) / n_denom
 
         true_bin = interpolate.InterpolatedUnivariateSpline(z_list, res, ext=1)
 
