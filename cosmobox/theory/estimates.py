@@ -87,13 +87,13 @@ class ShearShear:
         sig0 = 0.05
         fout = 0.1
 
-        fac1 = (1.0 - fout)/(np.sqrt(2.0 * np.pi) * sigb * (1.0 + z))
+        fac1 = (1.0 - fout) / (np.sqrt(2.0 * np.pi) * sigb * (1.0 + z))
         fac2 = fout / (np.sqrt(2.0 * np.pi) * sig0 * (1.0 + z))
 
         p_val = ((fac1 * np.exp((-0.5) * ((z - (cb * zp) -
                                            zb) / (sigb * (1.0 + z)))**2.0)) +
                  (fac2 * np.exp((-0.5) * ((z - (c0 * zp) -
-                                           z0)/(sig0 * (1.0 + z)))**2.0)))
+                                           z0) / (sig0 * (1.0 + z)))**2.0)))
 
         return p_val
 
