@@ -13,7 +13,8 @@ class ShearShear:
     """
     Class for weak lensing observables.
     """
-    def __init__(self, bin_i, bin_j, n_type='istf', n_file=None, **kwargs):
+    def __init__(self, bin_i, bin_j, n_type='istf', n_file=None,
+                 survey_lims=[0.001, 2.5], **kwargs):
         """
         Parameters
         ----------
@@ -28,8 +29,11 @@ class ShearShear:
                            be specified.
         n_file: string
                 Location of custom n(z) file.
-
+        survey_lims: array-like, floats
+                     Redshift range of entire survey (lower, higher)
+                     Euclid default (0.001, 2.5).
         """
+        self.survey_min, self.survey_max = survey_lims
         if n_type == 'istf':
             self.n_i = self.p_up(bin_i[0], bin_i[1])
             self.n_j = self.p_up(bin_j[0], bin_j[1])
@@ -38,9 +42,35 @@ class ShearShear:
                 raise Exception('When choosing a custom n(z), you must'
                                 'specify the file location using n_file.')
 
-    def n_istf(self, z):
+    def n_istf(self, z, n_gal=30.0):
         """
-        Implements true galaxy source distribution as defined by Euclid
+        Implements true, normalised galaxy source distribution as defined by
+        Euclid IST: Forecasting.
+
+        See Eq. 113 of https://arxiv.org/abs/1910.09273
+
+        Parameters
+        ----------
+        z: float
+           Redshift at which to evaluate distribution.
+        n_gal: float
+               Galaxy surface density of survey.
+               Euclid default - 30 arcmin^{2}.
+
+        Returns
+        -------
+        float
+            n(z) for ISTF source distribution.
+        """
+        n_dist_int = integrate.quad(self.n_istf_int, a=self.survey_min,
+                                    b=self.survey_max)
+        prop_con = n_gal / n_dist_int[0]
+        fin_n = prop_con * self.n_istf_int(z=z)
+        return fin_n
+
+    def n_istf_int(self, z):
+        """
+        Integrand for true galaxy source distribution as defined by Euclid
         IST: Forecasting.
 
         See Eq. 113 of https://arxiv.org/abs/1910.09273
@@ -53,7 +83,7 @@ class ShearShear:
         Returns
         -------
         float
-            n(z) for ISTF source distribution.
+            unnormalised n(z) for ISTF source distribution.
         """
         zm = 0.9
         z0 = zm / np.sqrt(2.0)
@@ -139,7 +169,7 @@ class ShearShear:
         float
             Observed n(z) with photometric redshift uncertainties accounted.
         """
-        z_list = np.arange(0.001, 2.5, 0.1)
+        z_list = np.arange(self.survey_min, self.survey_max, 0.1)
         n_nums_list = []
         for zind in range(len(z_list)):
             finprod = (self.n_istf(z_list[zind]) *

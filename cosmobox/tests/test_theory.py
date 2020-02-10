@@ -19,20 +19,30 @@ class WLnzTestCase(TestCase):
                           0.037586840798216704]
         self.nfinchecks = [1.7212476944896058, 3.258728496592645,
                            3.193587520650502]
+        self.concheck = 70.96974856474282
 
     def tearDown(self):
         self.nRBchecks = None
         self.nfinchecks = None
+        self.concheck = None
 
     def test_true_rb_nz(self):
         shearshear = estimates.ShearShear([0.001, 0.418], [0.001, 0.418])
-        rb1 = shearshear.n_istf(0.1)
-        rb2 = shearshear.n_istf(1.0)
-        rb3 = shearshear.n_istf(2.0)
+        rb1 = shearshear.n_istf_int(0.1)
+        rb2 = shearshear.n_istf_int(1.0)
+        rb3 = shearshear.n_istf_int(2.0)
         npt.assert_almost_equal([rb1, rb2, rb3],
                                 self.nRBchecks,
                                 err_msg='True n(z) from Euclid RedBook '
                                         'is incorrect.')
+
+    def test_normalisation(self):
+        shearshear = estimates.ShearShear([0.001, 0.418], [0.001, 0.418])
+        proptest = (estimates.n_istf(z=0.1, n_gal=30.0)
+                    / estimates.n_istf_int(z=0.1))
+        npt.assert_almost_equal(proptest, self.concheck,
+                                err_msg='n(z) proportionality constant not'
+                                        'calculating correctly.')
 
     def test_phot_p(self):
         shearshear = estimates.ShearShear([0.001, 0.418], [0.001, 0.418])
