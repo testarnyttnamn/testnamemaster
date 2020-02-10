@@ -38,8 +38,8 @@ class WLnzTestCase(TestCase):
 
     def test_normalisation(self):
         shearshear = estimates.ShearShear([0.001, 0.418], [0.001, 0.418])
-        proptest = (estimates.n_istf(z=0.1, n_gal=30.0)
-                    / estimates.n_istf_int(z=0.1))
+        proptest = (shearshear.n_istf(z=0.1, n_gal=30.0) /
+                    shearshear.n_istf_int(z=0.1))
         npt.assert_almost_equal(proptest, self.concheck,
                                 err_msg='n(z) proportionality constant not'
                                         'calculating correctly.')
