@@ -1,29 +1,27 @@
 [![pipeline status](https://gitlab.euclid-sgs.uk/pf-ist-likelihood/likelihood-implementation/badges/master/pipeline.svg)](https://gitlab.euclid-sgs.uk/pf-ist-likelihood/likelihood-implementation/commits/master) [![coverage report](https://gitlab.euclid-sgs.uk/pf-ist-likelihood/likelihood-implementation/badges/master/coverage.svg)](https://gitlab.euclid-sgs.uk/pf-ist-likelihood/likelihood-implementation/commits/master)
 
-# Likelihood-implementation
+# Mock structure for COBAYA as external likelihood
 
-## Set-Up
+### What's COBAYA?
 
-### Stand alone build
+Cobaya (code for bayesian analysis, and Spanish for Guinea Pig) is a framework for sampling and statistical modelling: it allows you to explore an arbitrary prior or posterior using a range of Monte Carlo samplers (including the advanced MCMC sampler from CosmoMC, and the advanced nested sampler PolyChord).
 
-The package can be installed by simply running:
+### COBAYA's documentation
 
-```bash
-python setup.py install
-```
+Check [documentation](https://cobaya.readthedocs.io/en/latest/index.html)
 
-### Conda environment
+### Install COBAYA
 
-To build the package in a dedicated Conda environment with development tools run:
+Install Cobaya by simply running:
 
 ```bash
-conda env create -f environment.yml
-conda activate cosmobox
-python setup.py install
+pip install cobaya --upgrade
 ```
 
-### Unit tests
+### Calling external likelihood
 
+
+### Run unit test
 To run the unit tests locally run:
 
 ```bash
