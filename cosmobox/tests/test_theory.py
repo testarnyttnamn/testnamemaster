@@ -19,7 +19,7 @@ class WLnzTestCase(TestCase):
                           0.037586840798216704]
         self.nfinchecks = [1.7212476944896058, 3.258728496592645,
                            3.193587520650502]
-        self.concheck = 70.96974856474282
+        self.concheck = 70.71084813162472
 
     def tearDown(self):
         self.nRBchecks = None
@@ -33,8 +33,8 @@ class WLnzTestCase(TestCase):
         rb3 = shearshear.n_istf_int(2.0)
         npt.assert_almost_equal([rb1, rb2, rb3],
                                 self.nRBchecks,
-                                err_msg='True n(z) from Euclid RedBook '
-                                        'is incorrect.')
+                                err_msg='True unormalised n(z) from Euclid '
+                                        'RedBook is incorrect.')
 
     def test_normalisation(self):
         shearshear = estimates.ShearShear([0.001, 0.418], [0.001, 0.418])
@@ -65,3 +65,21 @@ class WLnzTestCase(TestCase):
     def test_custom_nz_exp(self):
         npt.assert_raises(Exception, estimates.ShearShear,
                           [0.001, 0.418], [0.001, 0.418], 'custom')
+
+    def test_custom_no_bcols(self):
+        npt.assert_raises(Exception, estimates.ShearShear,
+                          [0.001, 0.418], [0.001, 0.418], 'custom',
+                          'test_fname')
+
+    def test_custom_wrong_bcols(self):
+        npt.assert_raises(ValueError, estimates.ShearShear,
+                          [0.001, 0.418], [0.001, 0.418], 'custom',
+                          'test_fname', 0)
+
+    def test_nz_choice(self):
+        npt.assert_raises(Exception, estimates.ShearShear,
+                          [0.001, 0.418], [0.001, 0.418], 'yeet')
+
+    def test_nz_value_err(self):
+        shearshear = estimates.ShearShear([0.001, 0.418], [0.001, 0.418])
+        npt.assert_raises(ValueError, shearshear.n_i(4.2))

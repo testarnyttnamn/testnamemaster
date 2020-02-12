@@ -11,10 +11,10 @@ from scipy import interpolate
 
 class ShearShear:
     """
-    Class for weak lensing observables.
+    Class for cosmic shear observables.
     """
-    def __init__(self, bin_i, bin_j, n_type='istf', n_file=None,
-                 survey_lims=[0.001, 2.5], **kwargs):
+    def __init__(self, bin_i, bin_j, n_type='istf', n_file=None, bcols=None,
+                 survey_lims=[0.001, 4.0], **kwargs):
         """
         Parameters
         ----------
@@ -29,9 +29,11 @@ class ShearShear:
                            be specified.
         n_file: string
                 Location of custom n(z) file.
+        bcols: array-like, ints
+               Column indices for desired bins in custom n(z) file. (i, j)
         survey_lims: array-like, floats
                      Redshift range of entire survey (lower, higher)
-                     Euclid default (0.001, 2.5).
+                     Euclid default (0.001, 4.0).
         """
         self.survey_min, self.survey_max = survey_lims
         if n_type == 'istf':
@@ -41,6 +43,26 @@ class ShearShear:
             if n_file is None:
                 raise Exception('When choosing a custom n(z), you must'
                                 'specify the file location using n_file.')
+            elif bcols is None:
+                raise Exception('When choosing a custom n(z) file, you must '
+                                'specify the columns in the file which contain'
+                                ' the desired bins.')
+            elif bcols == 0:
+                raise ValueError('The first column in the n(z) file must'
+                                 ' correspond to the sampled redshifts. So, '
+                                 'bcols > 0.')
+            else:
+                ntab = np.loadtxt(n_file)
+                self.n_i = interpolate.InterpolatedUnivariateSpline(ntab[:, 0],
+                                                                    ntab[:,
+                                                                    bcols[0]],
+                                                                    ext=2)
+                self.n_j = interpolate.InterpolatedUnivariateSpline(ntab[:, 0],
+                                                                    ntab[:,
+                                                                    bcols[1]],
+                                                                    ext=2)
+        else:
+            raise Exception('n_type must be istf or custom.')
 
     def n_istf(self, z, n_gal=30.0):
         """
@@ -55,7 +77,7 @@ class ShearShear:
            Redshift at which to evaluate distribution.
         n_gal: float
                Galaxy surface density of survey.
-               Euclid default - 30 arcmin^{2}.
+               Euclid default - 30 arcmin^{-2}.
 
         Returns
         -------
@@ -68,7 +90,7 @@ class ShearShear:
         fin_n = prop_con * self.n_istf_int(z=z)
         return fin_n
 
-    def n_istf_int(self, z):
+    def n_istf_int(self, z, zm=0.9):
         """
         Integrand for true galaxy source distribution as defined by Euclid
         IST: Forecasting.
@@ -79,18 +101,20 @@ class ShearShear:
         ----------
         z: float
            Redshift at which to evaluate distribution.
+        zm: float
+            Median redshift of survey. Euclid default = 0.9.
 
         Returns
         -------
         float
             unnormalised n(z) for ISTF source distribution.
         """
-        zm = 0.9
         z0 = zm / np.sqrt(2.0)
         n_val = ((z / z0)**2.0) * np.exp((-(z / z0)**1.5))
         return n_val
 
-    def p_phot(self, zp, z):
+    def p_phot(self, zp, z, cb=1.0, zb=0.0, sigb=0.05, co=1.0, zo=0.1,
+               sigo=0.05, fout=0.1):
         """
         Probability distribution function, describing the probability that
         a galaxy with redshift z has a measured redshift zp.
@@ -103,27 +127,41 @@ class ShearShear:
             Measured photometric redshift
         z: float
            True redshift
+        cb: float
+            Multiplicative bias on sample with well-measured redshift.
+            Euclid IST: Forecasting default = 1.0.
+        zb: float
+            Additive bias on sample with well-measured redshift.
+            Euclid IST: Forecasting default = 0.0.
+        sigb: float
+              Sigma for sample with well-measured redshift.
+              Euclid IST: Forecasting default = 0.05.
+        co: float
+            Multiplicative bias on sample of catastrophic outliers.
+            Euclid IST: Forecasting default = 1.0.
+        zo: float
+            Additive bias on sample of catastrophic outliers.
+            Euclid IST: Forecasting default = 0.1.
+        sigo: float
+              Sigma for sample of catastrophic outliers.
+              Euclid IST: Forecasting default = 0.05.
+        fout: float
+              Fraction of catastrophic outliers.
+              Euclid IST: Forecasting default = 0.1.
 
         Returns
         -------
         float
             Probability.
         """
-        cb = 1.0
-        zb = 0.0
-        sigb = 0.05
-        c0 = 1.0
-        z0 = 0.1
-        sig0 = 0.05
-        fout = 0.1
 
         fac1 = (1.0 - fout) / (np.sqrt(2.0 * np.pi) * sigb * (1.0 + z))
-        fac2 = fout / (np.sqrt(2.0 * np.pi) * sig0 * (1.0 + z))
+        fac2 = fout / (np.sqrt(2.0 * np.pi) * sigo * (1.0 + z))
 
         p_val = ((fac1 * np.exp((-0.5) * ((z - (cb * zp) -
                                            zb) / (sigb * (1.0 + z)))**2.0)) +
-                 (fac2 * np.exp((-0.5) * ((z - (c0 * zp) -
-                                           z0) / (sig0 * (1.0 + z)))**2.0)))
+                 (fac2 * np.exp((-0.5) * ((z - (co * zp) -
+                                           zo) / (sigo * (1.0 + z)))**2.0)))
 
         return p_val
 
@@ -150,10 +188,10 @@ class ShearShear:
                                                   b=bin_z_max, args=(z))[0]
         return ret_val
 
-    def p_up(self, bin_z_min, bin_z_max):
+    def p_up(self, bin_z_min, bin_z_max, int_step=0.1):
         """
-        Computes the true galaxy distribution, by carrying out convolution of
-        true n(z) with photometric uncertainty PDF.
+        Computes the observed galaxy distribution, by carrying out convolution
+        of true n(z) with photometric uncertainty PDF.
 
         Eq. 112 of https://arxiv.org/abs/1910.09273
 
@@ -163,13 +201,16 @@ class ShearShear:
                    High z end of bin
         bin_z_min: float
                    Low z end of bin
+        int_step: float
+                  Redshift step size for interpolating final n(z).
+                  Default = 0.1.
 
         Returns
         -------
         float
             Observed n(z) with photometric redshift uncertainties accounted.
         """
-        z_list = np.arange(self.survey_min, self.survey_max, 0.1)
+        z_list = np.arange(self.survey_min, self.survey_max, int_step)
         n_nums_list = []
         for zind in range(len(z_list)):
             finprod = (self.n_istf(z_list[zind]) *
@@ -182,6 +223,6 @@ class ShearShear:
 
         res = np.array(n_nums_list) / n_denom
 
-        true_bin = interpolate.InterpolatedUnivariateSpline(z_list, res, ext=1)
+        obs_bin = interpolate.InterpolatedUnivariateSpline(z_list, res, ext=2)
 
-        return true_bin
+        return obs_bin
