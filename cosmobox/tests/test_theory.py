@@ -82,4 +82,4 @@ class WLnzTestCase(TestCase):
 
     def test_nz_value_err(self):
         shearshear = estimates.ShearShear([0.001, 0.418], [0.001, 0.418])
-        npt.assert_raises(ValueError, shearshear.n_i(4.2))
+        npt.assert_raises(ValueError, shearshear.n_i, 4.2)
