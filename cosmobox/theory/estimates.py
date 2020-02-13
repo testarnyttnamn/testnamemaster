@@ -30,7 +30,9 @@ class ShearShear:
         n_file: string
                 Location of custom n(z) file.
         bcols: array-like, ints
-               Column indices for desired bins in custom n(z) file. (i, j)
+               Column indices for desired bins in custom n(z) file. (i, j).
+               Note: index 0 is for the redshift column. Tomographic bin
+               indices should start from 1.
         survey_lims: array-like, floats
                      Redshift range of entire survey (lower, higher)
                      Euclid default (0.001, 4.0).
