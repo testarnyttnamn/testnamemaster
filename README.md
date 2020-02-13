@@ -17,9 +17,16 @@ Install Cobaya by simply running:
 ```bash
 pip install cobaya --upgrade
 ```
+### Install modules for COBAYA (such as CAMB, CLASS, Polychord...)
+
+Check [instructions](https://cobaya.readthedocs.io/en/latest/installation_cosmo.html)
+
+```bash
+cobaya-install cosmo -m /path/to/modules
+```
 
 ### Calling external likelihood
-
+Open and play with ```notebooks/likelihood_test.ipynb```
 
 ### Run unit test
 To run the unit tests locally run:
