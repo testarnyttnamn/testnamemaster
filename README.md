@@ -26,13 +26,4 @@ cobaya-install cosmo -m /path/to/modules
 ```
 
 ### Calling external likelihood
-Open and play with ```notebooks/likelihood_test.ipynb```
-
-### Run unit test
-To run the unit tests locally run:
-
-```bash
-python setup.py test
-```
-
-Note that this requires the development tools.
+Open and play with ```likelihood/likelihood_test.ipynb```
