@@ -11,6 +11,7 @@ zwin  = np.linspace(zmin,zmax,zsamp)
 #Specifications for Power Spectra
 kmax = 25.0
 
+#For this function to work, CAMB needs to be installed
 def gc_spec_like(_theory={"Pk_interpolator": {"z": zwin, "k_max": kmax, "extrap_kmax": 500, "nonlinear": True,"vars_pairs": ([["delta_tot", "delta_tot"]])}, "comoving_radial_distance": {"z": zwin},"H": {"z": zwin, "units": "km/s/Mpc"}}):
 
     #How to call cosmological quantities (example from Matteo)
@@ -20,6 +21,8 @@ def gc_spec_like(_theory={"Pk_interpolator": {"z": zwin, "k_max": kmax, "extrap_
     Pk_interpolator = _theory.get_Pk_interpolator()
     PKdelta = Pk_interpolator["delta_tot_delta_tot"]
     
+    #This will be the like-function: it should return -0.5*chi2
+    #As an example to test connection with COBAYA I just return 0
     return 0
 
 
