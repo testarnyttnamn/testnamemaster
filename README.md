@@ -31,7 +31,7 @@ Open and play with ```likelihood/likelihood_test.ipynb```
 ## Structure of the repository
 
 *  **data**: future data folder
-*  ** docs**: documentation
+*  **docs**: documentation
 *  **tests**: unit tests to check likelihood code
     *   ```test_estimates.py```: class with unit tests for common class estimate.py
                                  needs update to the new structure!!!
