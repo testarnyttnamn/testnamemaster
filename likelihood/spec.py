@@ -29,21 +29,21 @@ class Spec:
         found below:     
         https://www.overleaf.com/read/pvfkzvvkymbj     
         """
+        
         # SJ: Set up power spectrum [note weirdly Cobaya has it as P(z,k) 
         # SJ: instead of the more common P(k,z)]     
-        Pk_interpolator = self.theory.get_Pk_interpolator()     
-        self.Pk_delta = Pk_interpolator["delta_tot_delta_tot"]
+        Pk_interpolator = self.theory['Pk_interpolator']     
+        Pk_delta = self.theory['Pk_delta']
         # SJ: For now, fix redshift (and scale), 
         # fix galaxy bias = 1, and fix sigma8(z) = 1     
         # Cobaya does not seem to allow for either growth rate alone or sigma8 alone 
         # to be called yet (only their combination).     
-        zk = 0.5     
         b_gal = 1.0     
         sigma8 = 1.0     
         # compute Eqns 25-27        
-        beta = self.theory.get_fsigma8(zk)/sigma8/b_gal     
-        Pk_gal = (b_gal**2.0)*self.Pk_delta.P(zk, 0.02)     
-        P0k = (1.0 + 2.0/3.0*beta + 1.0/5.0*beta**2.0)*Pk_gal     
+        beta = self.theory['fsigma8']/sigma8/b_gal     
+        Pk_gal = (b_gal**2.0)*self.theory['Pk_delta'].P(self.theory['zk'], 0.02)     
+        P0k = (1.0 + 2.0/3.0*beta + 1.0/5.0*beta**2.0)*Pk_gal   
         P2k = (4.0/3.0*beta + 4.0/7.0*beta**2.0)*Pk_gal    
         P4k = (8.0/35.0*beta**2.0)*Pk_gal
 
@@ -60,6 +60,6 @@ class Spec:
         # SJ: This will be the log-likelihood; 
         # for now just return P(z,k) for fixed z and k.     
         self.beta_eqs()     
-        return self.Pk_delta.P(0.5, 0.02)
+        return self.theory['Pk_delta'].P(0.5, 0.02)
 
 

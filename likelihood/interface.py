@@ -26,8 +26,10 @@ z_max  = 2.5
 z_samp = 10 
 z_win  = np.linspace(z_min,z_max,z_samp)
 
+# (GCH): value to be evaluated fsigma8
+zk = 0.5
 
-def loglike(param=0.8, like_selection=None, _theory={"Pk_interpolator": {"z": z_win, "k_max": k_max, "extrap_kmax": 2, "nonlinear": True,"vars_pairs": ([["delta_tot", "delta_tot"]])}, "comoving_radial_distance": {"z": z_win},"H": {"z": z_win, "units": "km/s/Mpc"},"fsigma8": {"z": z_win, "units": None}}):
+def loglike(like_selection=None, _theory={"Pk_interpolator": {"z": z_win, "k_max": k_max, "extrap_kmax": 2, "nonlinear": True,"vars_pairs": ([["delta_tot", "delta_tot"]])}, "comoving_radial_distance": {"z": z_win},"H": {"z": z_win, "units": "km/s/Mpc"},"fsigma8": {"z": z_win, "units": None}}):
     r""" loglike
         
     External likelihood module called by COBAYA
@@ -49,6 +51,26 @@ def loglike(param=0.8, like_selection=None, _theory={"Pk_interpolator": {"z": z_
     loglikes: float
             must return -0.5*chi2
     """
+    # (GCH): re-define _theory needs of COBAYA
+    # (GCH): I guess that this can be made automatically asking
+    # (GCH): the theory code which parameters it has... search for it!!
+    theory_dic = {'H0': _theory.get_param("H0"), 
+                  'omch2': _theory.get_param('omch2'),
+                  'ombh2': _theory.get_param('ombh2'), 
+                  'mnu': _theory.get_param('mnu'),
+                  'comov_dist': _theory.get_comoving_radial_distance(z_win),
+                  'H': _theory.get_H(z_win),
+                  'Pk_interpolator': _theory.get_Pk_interpolator(),
+                  'Pk_delta': None,
+                  'fsigma8':  None,
+                  'zk': zk,
+                  }
+    theory_dic['Pk_delta'] = theory_dic['Pk_interpolator']['delta_tot_delta_tot']
+    theory_dic['fsigma8'] = _theory.get_fsigma8(theory_dic['zk'])
+
+    # (GCH): Careful! In the future, there should be a way to retrieving _derived
+    # (GCH): parameters
+
     # (GCH) Define loglike variable
     loglike = 0.0
     # (GCH): issue with cobaya to pass strings to external likelihood
@@ -63,14 +85,14 @@ def loglike(param=0.8, like_selection=None, _theory={"Pk_interpolator": {"z": z_
     #(GCH) Select with class to work with based on like_selection 
     #(GCH) Within each if-statement, compute loglike
     if like_selection.lower() == "shear":
-        shear_ins = Shear(theory=_theory)
+        shear_ins = Shear(theory=theory_dic)
         loglike=shear_ins.loglike()
     elif like_selection.lower() == "spec":
-        spec_ins = Spec(theory=_theory)
+        spec_ins = Spec(theory=theory_dic)
         loglike=spec_ins.loglike()
     elif like_selection.lower() == 'both':
-        shear_ins = Shear(theory=_theory)
-        spec_ins = Spec(theory=_theory)
+        shear_ins = Shear(theory=theory_dic)
+        spec_ins = Spec(theory=theory_dic)
         loglike_shear=shear_ins.loglike()
         loglike_spec=spec_ins.loglike()
         loglike=loglike_shear+loglike_spec
