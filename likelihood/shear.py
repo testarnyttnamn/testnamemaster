@@ -8,7 +8,7 @@ class Shear:
     """
     Class for Shear observable
     """
-    def __init__(self, theory=theory):
+    def __init__(self,theory=None):
         """
         Parameters
         ----------
