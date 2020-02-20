@@ -36,7 +36,7 @@ Open and play with ```likelihood/likelihood_test.ipynb```
     *   ```test_estimates.py```: class with unit tests for common class estimate.py
                                  needs update to the new structure!!!
 *  **likelihood**: likelihood code
-    *  ```interface.py```: interface with COBAYA, pass theory needs to other classes, returns loglike
+    *  ```cobaya_interface.py```: interface with COBAYA, pass theory needs to other classes, returns loglike
     *  ```estimates.py```: general class with common aux functions useful for both WL and GC
     *  ```shear.py```: class to code the ShearShear observable
     *  ```spec.py```: class to code the spectroscopy GC observable
