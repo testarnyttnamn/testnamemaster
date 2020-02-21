@@ -23,7 +23,7 @@ pages:
     - source activate likelihood
     - pip install sphinx sphinx-rtd-theme numpydoc
     - mkdir docs/build
-    - sphinx-apidoc -feo docs/source euclid-likelihood
+    - sphinx-apidoc -feo docs/source likelihood
     - sphinx-build docs/source docs/build
     - mv docs/build public/
   artifacts:
