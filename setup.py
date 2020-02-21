@@ -4,7 +4,7 @@
 from setuptools import setup, find_packages
 import os
 
-__name__ = 'euclid-likelihood'
+__name__ = ''
 
 release_info = {}
 infopath = os.path.abspath(os.path.join(os.path.dirname(__file__),

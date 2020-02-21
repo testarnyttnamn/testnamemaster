@@ -9,7 +9,7 @@ from unittest import TestCase
 import numpy as np
 import numpy.testing as npt
 from scipy import integrate
-from ..likelihood import *
+from .likelihood import *
 
 
 class WLnzTestCase(TestCase):
