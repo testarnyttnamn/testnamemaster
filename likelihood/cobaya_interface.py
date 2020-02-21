@@ -3,8 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 #Import loglike classes
-from shear import Shear
-from spec import Spec
+from photometric_survey.shear import Shear
+from spectroscopic_survey.spec import Spec
 
 #Error classes
 class CobayaInterfaceError(Exception):

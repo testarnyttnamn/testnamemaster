@@ -9,7 +9,7 @@ from scipy import integrate
 from scipy import interpolate
 
 
-class Estimates:
+class Galdist:
     """
     Class for cosmic shear observables.
     """

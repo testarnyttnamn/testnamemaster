@@ -2,7 +2,7 @@
 import numpy as np
 
 #Import auxilary classes
-from estimates import Estimates
+from general_specs.estimates import Galdist
 
 class Shear:
     """
