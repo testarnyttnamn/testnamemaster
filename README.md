@@ -26,17 +26,20 @@ cobaya-install cosmo -m /path/to/modules
 ```
 
 ### Calling external likelihood
-Open and play with ```likelihood/likelihood_test.ipynb```
+Open and play with ```likelihood_test.ipynb```
 
 ## Structure of the repository
 
 *  **data**: future data folder
 *  **docs**: documentation
-*  **tests**: unit tests to check likelihood code
-    *   ```test_estimates.py```: class with unit tests for common class estimate.py
-                                 needs update to the new structure!!!
 *  **likelihood**: likelihood code
-    *  ```cobaya_interface.py```: interface with COBAYA, pass theory needs to other classes, returns loglike
-    *  ```estimates.py```: general class with common aux functions useful for both WL and GC
-    *  ```shear.py```: class to code the ShearShear observable
-    *  ```spec.py```: class to code the spectroscopy GC observable
+    *  ```cobaya_interface.py```: interface with COBAYA, pass theory needs to other classes, returns loglike  
+    * test: unit tests to check likelihood code
+        *   ```test_estimates.py```: class with unit tests for common class estimate.py
+                                      
+    * general_specs: general module with common aux functions useful for both WL and GC
+        *   ```estimates.py```
+    * photometric_survey: code for photo z observable
+        *  ```shear.py```
+    * spectroscopic_survey: code for the spectroscopy GC observable
+        * ```spec.py```
