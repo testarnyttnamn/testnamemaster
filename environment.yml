@@ -1,4 +1,4 @@
-name: euclid-likelihood
+name: likelihood
 channels:
   - conda-forge
   - defaults
