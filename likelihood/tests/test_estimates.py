@@ -10,15 +10,7 @@ import numpy as np
 import numpy.testing as npt
 from scipy import integrate
 
-import sys
-sys.path.append('..')
-#sys.path.insert(0,'/home/matteo/Euclid/likelihood-implementation/')
-#print(sys.path)
-
-from general_specs import estimates
-#from photometric_survey import shear
-#from  
-
+from likelihood.general_specs import estimates
 
 
 class WLnzTestCase(TestCase):

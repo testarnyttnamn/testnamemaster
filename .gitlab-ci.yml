@@ -10,7 +10,7 @@ before_script:
   - ./miniconda.sh -b -p $HOME/miniconda
   - export PATH=$HOME/miniconda/bin:$PATH
   - conda env create -f environment.yml
-  - source activate euclid-likelihood
+  - source activate likelihood
   - pip install coverage nose pytest pytest-cov
 
 # Install package
@@ -20,7 +20,7 @@ Install:
 # Build API docs
 pages:
   script:
-    - source activate euclid-likelihood
+    - source activate likelihood
     - pip install sphinx sphinx-rtd-theme numpydoc
     - mkdir docs/build
     - sphinx-apidoc -feo docs/source euclid-likelihood
