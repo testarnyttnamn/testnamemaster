@@ -15,7 +15,9 @@ sys.path.append('..')
 #sys.path.insert(0,'/home/matteo/Euclid/likelihood-implementation/')
 #print(sys.path)
 
-from likelihood import *
+from general_specs import estimates
+#from photometric_survey import shear
+#from  
 
 
 
@@ -70,7 +72,7 @@ class WLnzTestCase(TestCase):
                                 err_msg='ISTF n(z) producing incorrect values')
 
     def test_custom_nz_exp(self):
-        npt.assert_raises(Exception, estimates.Galdsit,
+        npt.assert_raises(Exception, estimates.Galdist,
                           [0.001, 0.418], [0.001, 0.418], 'custom')
 
     def test_custom_no_bcols(self):
