@@ -9,7 +9,14 @@ from unittest import TestCase
 import numpy as np
 import numpy.testing as npt
 from scipy import integrate
-from .likelihood import *
+
+import sys
+sys.path.append('..')
+#sys.path.insert(0,'/home/matteo/Euclid/likelihood-implementation/')
+#print(sys.path)
+
+from likelihood import *
+
 
 
 class WLnzTestCase(TestCase):
