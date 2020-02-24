@@ -10,6 +10,7 @@ import numpy as np
 # Import auxilary classes
 # (GCH): for instance, estimates from general_specss
 
+
 class Spec:
     """
     Class for GC spectroscopy observable
