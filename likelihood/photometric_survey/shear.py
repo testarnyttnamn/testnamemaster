@@ -22,6 +22,6 @@ class Shear:
         Returns loglike for Shear observable
         """
 
-        #likelihood value is currently only a place holder!
-        loglike = 0.0 
+        # likelihood value is currently only a place holder!
+        loglike = 0.0
         return loglike
