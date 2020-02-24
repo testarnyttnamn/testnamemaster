@@ -50,7 +50,7 @@ class WLnzTestCase(TestCase):
         zp_list = np.linspace(0.0, 1, 200)
         ilist = []
         for zp in zp_list:
-            ilist.append(galdist.p_phot(zp=zp, z=0.5))
+            ilist.append(galdist.p_phot(z_photo=zp, z=0.5))
         npt.assert_almost_equal(integrate.trapz(ilist, zp_list), 1.0,
                                 err_msg='Photo-z PDF not correctly normalised')
 
