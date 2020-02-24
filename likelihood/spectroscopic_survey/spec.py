@@ -8,8 +8,7 @@ Prototype computation of spectroscopic galaxy clustering likelihood.
 import numpy as np
 
 # Import auxilary classes
-from ..general_specs.estimates import Galdist
-
+# (GCH): for instance, estimates from general_specss
 
 class Spec:
     """
