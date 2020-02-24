@@ -18,9 +18,9 @@ class Galdist:
         """
         Parameters
         ----------
-        bin_i: array-like, floats
+        bin_i: list, float
            Redshift bounds of bin i (lower, higher)
-        bin_j: array-like, floats
+        bin_j: list, float
            Redshift bounds of bin j (lower, higher)
         n_type: str
            Parameter to specify which n(z) to use:
@@ -29,11 +29,11 @@ class Galdist:
            be specified.
         n_file: str
            Location of custom n(z) file.
-        bcols: array-like, ints
+        bcols: list, int
            Column indices for desired bins in custom n(z) file. (i, j).
            Note: index 0 is for the redshift column. Tomographic bin
            indices should start from 1.
-        survey_lims: array-like, floats
+        survey_lims: list, float
            Redshift range of entire survey (lower, higher)
            Euclid default (0.001, 4.0).
         """
@@ -115,39 +115,40 @@ class Galdist:
         n_val = ((z / z0)**2.0) * np.exp((-(z / z0)**1.5))
         return n_val
 
-    def p_phot(self, zp, z, cb=1.0, zb=0.0, sigb=0.05, co=1.0, zo=0.1,
-               sigo=0.05, fout=0.1):
+    def p_phot(self, z_photo, z, c_b=1.0, z_b=0.0, sigma_b=0.05,
+               c_outlier=1.0, z_outlier=0.1, sigma_outlier=0.05,
+               outlier_frac=0.1):
         """
         Probability distribution function, describing the probability that
-        a galaxy with redshift z has a measured redshift zp.
+        a galaxy with redshift z has a measured redshift z_photo.
 
         Eq. 115 of https://arxiv.org/abs/1910.09273
 
         Parameters
         ----------
-        zp: float
+        z_photo: float
             Measured photometric redshift
         z:  float
             True redshift
-        cb: float
+        c_b: float
             Multiplicative bias on sample with well-measured redshift.
             Euclid IST: Forecasting default = 1.0.
-        zb: float
+        z_b: float
             Additive bias on sample with well-measured redshift.
             Euclid IST: Forecasting default = 0.0.
-        sigb: float
+        sigma_b: float
             Sigma for sample with well-measured redshift.
             Euclid IST: Forecasting default = 0.05.
-        co: float
+        c_outlier: float
             Multiplicative bias on sample of catastrophic outliers.
             Euclid IST: Forecasting default = 1.0.
-        zo: float
+        z_outlier: float
             Additive bias on sample of catastrophic outliers.
             Euclid IST: Forecasting default = 0.1.
-        sigo: float
+        sigma_outlier: float
             Sigma for sample of catastrophic outliers.
             Euclid IST: Forecasting default = 0.05.
-        fout: float
+        outlier_frac: float
             Fraction of catastrophic outliers.
             Euclid IST: Forecasting default = 0.1.
 
@@ -157,13 +158,16 @@ class Galdist:
             Probability.
         """
 
-        fac1 = (1.0 - fout) / (np.sqrt(2.0 * np.pi) * sigb * (1.0 + z))
-        fac2 = fout / (np.sqrt(2.0 * np.pi) * sigo * (1.0 + z))
+        fac1 = ((1.0 - outlier_frac) / (np.sqrt(2.0 * np.pi) *
+                sigma_b * (1.0 + z)))
+        fac2 = (outlier_frac / (np.sqrt(2.0 * np.pi) *
+                sigma_outlier * (1.0 + z)))
 
-        p_val = ((fac1 * np.exp((-0.5) * ((z - (cb * zp) -
-                                           zb) / (sigb * (1.0 + z)))**2.0)) +
-                 (fac2 * np.exp((-0.5) * ((z - (co * zp) -
-                                           zo) / (sigo * (1.0 + z)))**2.0)))
+        p_val = ((fac1 * np.exp((-0.5) * ((z - (c_b * z_photo) - z_b) /
+                                          (sigma_b * (1.0 + z)))**2.0)) +
+                 (fac2 * np.exp((-0.5) * ((z - (c_outlier * z_photo) -
+                                           z_outlier) /
+                                          (sigma_outlier * (1.0 + z)))**2.0)))
 
         return p_val
 
