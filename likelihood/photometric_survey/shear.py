@@ -10,7 +10,7 @@ class Shear:
     Class for Shear observable
     """
 
-    def __init__(self, theory=None):
+    def __init__(self, theory):
         """
         Parameters
         ----------
@@ -21,5 +21,7 @@ class Shear:
         """
         Returns loglike for Shear observable
         """
-        loglike = 0.0
+
+        #likelihood value is currently only a place holder!
+        loglike = 0.0 
         return loglike
