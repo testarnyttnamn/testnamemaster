@@ -19,23 +19,23 @@ class Galdist:
         Parameters
         ----------
         bin_i: array-like, floats
-               Redshift bounds of bin i (lower, higher)
+           Redshift bounds of bin i (lower, higher)
         bin_j: array-like, floats
-               Redshift bounds of bin j (lower, higher)
-        n_type: string
-                Parameter to specify which n(z) to use:
-                'istf' - Use Euclid IST:Forecasting n(z)
-                'custom' - Input custom n(z). In this case, n_file must also
-                           be specified.
-        n_file: string
-                Location of custom n(z) file.
+           Redshift bounds of bin j (lower, higher)
+        n_type: str
+           Parameter to specify which n(z) to use:
+           'istf' - Use Euclid IST:Forecasting n(z)
+           'custom' - Input custom n(z). In this case, n_file must also
+           be specified.
+        n_file: str
+           Location of custom n(z) file.
         bcols: array-like, ints
-               Column indices for desired bins in custom n(z) file. (i, j).
-               Note: index 0 is for the redshift column. Tomographic bin
-               indices should start from 1.
+           Column indices for desired bins in custom n(z) file. (i, j).
+           Note: index 0 is for the redshift column. Tomographic bin
+           indices should start from 1.
         survey_lims: array-like, floats
-                     Redshift range of entire survey (lower, higher)
-                     Euclid default (0.001, 4.0).
+           Redshift range of entire survey (lower, higher)
+           Euclid default (0.001, 4.0).
         """
         self.survey_min, self.survey_max = survey_lims
         if n_type == 'istf':
@@ -78,13 +78,13 @@ class Galdist:
         z: float
            Redshift at which to evaluate distribution.
         n_gal: float
-               Galaxy surface density of survey.
-               Euclid default - 30 arcmin^{-2}.
+           Galaxy surface density of survey.
+           Euclid default - 30 arcmin^{-2}.
 
         Returns
         -------
         float
-            n(z) for ISTF source distribution.
+           n(z) for ISTF source distribution.
         """
         n_dist_int = integrate.quad(self.n_istf_int, a=self.survey_min,
                                     b=self.survey_max)
@@ -104,12 +104,12 @@ class Galdist:
         z: float
            Redshift at which to evaluate distribution.
         zm: float
-            Median redshift of survey. Euclid default = 0.9.
+           Median redshift of survey. Euclid default = 0.9.
 
         Returns
         -------
         float
-            unnormalised n(z) for ISTF source distribution.
+           unnormalised n(z) for ISTF source distribution.
         """
         z0 = zm / np.sqrt(2.0)
         n_val = ((z / z0)**2.0) * np.exp((-(z / z0)**1.5))
@@ -127,8 +127,8 @@ class Galdist:
         ----------
         zp: float
             Measured photometric redshift
-        z: float
-           True redshift
+        z:  float
+            True redshift
         cb: float
             Multiplicative bias on sample with well-measured redshift.
             Euclid IST: Forecasting default = 1.0.
@@ -136,8 +136,8 @@ class Galdist:
             Additive bias on sample with well-measured redshift.
             Euclid IST: Forecasting default = 0.0.
         sigb: float
-              Sigma for sample with well-measured redshift.
-              Euclid IST: Forecasting default = 0.05.
+            Sigma for sample with well-measured redshift.
+            Euclid IST: Forecasting default = 0.05.
         co: float
             Multiplicative bias on sample of catastrophic outliers.
             Euclid IST: Forecasting default = 1.0.
@@ -145,11 +145,11 @@ class Galdist:
             Additive bias on sample of catastrophic outliers.
             Euclid IST: Forecasting default = 0.1.
         sigo: float
-              Sigma for sample of catastrophic outliers.
-              Euclid IST: Forecasting default = 0.05.
+            Sigma for sample of catastrophic outliers.
+            Euclid IST: Forecasting default = 0.05.
         fout: float
-              Fraction of catastrophic outliers.
-              Euclid IST: Forecasting default = 0.1.
+            Fraction of catastrophic outliers.
+            Euclid IST: Forecasting default = 0.1.
 
         Returns
         -------

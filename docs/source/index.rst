@@ -10,4 +10,4 @@ Package Contents
    :numbered:
    :maxdepth: 3
 
-   cosmobox
+   likelihood
