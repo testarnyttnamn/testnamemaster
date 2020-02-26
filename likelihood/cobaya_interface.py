@@ -32,7 +32,7 @@ z_win = np.linspace(z_min, z_max, z_samp)
 zk = 0.5
 
 
-def loglike(like_selection=None,
+def loglike(like_selection=12,
             _theory={"Pk_interpolator": {"z": z_win,
                                          "k_max": k_max,
                                          "extrap_kmax": 2,
@@ -48,15 +48,19 @@ def loglike(like_selection=None,
 
     Parameters
     ----------
-    like_selection: string
+    like_selection: int
               Parameter to specify which likelihood to  use:
-              'both' - use WL and GC spec
-              'shear' - use WL only
-              'spec' - use GC spec only
+              12 - use WL and GC spec (default value)
+              1 - use WL only
+              2 - use GC spec only
+              this will updated in the future by strings
     _theory: dictionary
             Theory needs required by Boltzmann Solver
             and used by COBAYA
-    _derived
+    _derived: dictionary
+            Future dictionary where new quantities
+            calculated by the likelihood can be saved
+            and passed to the sampler
 
     Returns
     ----------

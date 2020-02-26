@@ -16,12 +16,13 @@ class Spec:
     Class for GC spectroscopy observable
     """
 
-    def __init__(self, theory=None):
+    def __init__(self, theory):
         """
         Parameters
         ----------
         theory: dictionary
                Theory needs from COBAYA
+               updates the content of self.theory
         """
         self.theory = theory
 
