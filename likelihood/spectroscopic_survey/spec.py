@@ -8,7 +8,7 @@ Prototype computation of spectroscopic galaxy clustering likelihood.
 import numpy as np
 
 # Import auxilary classes
-# (GCH): for instance, estimates from general_specss
+# (GCH): for instance, estimates from general_specs
 
 
 class Spec:
@@ -28,29 +28,31 @@ class Spec:
 
     def beta_eqs(self):
         """
-        Computation of Eqns 25 - 27 of Euclid IST:L documentation,
+        Computation of Eqns 25 - 27 of Euclid IST:L documentation
+        (corresponding to multipole power spectra pre geometric distortions),
         found below:
-        https://www.overleaf.com/read/pvfkzvvkymbj
+            https://www.overleaf.com/read/pvfkzvvkymbj
+        Eqns 25 - 27 shown in latex format below:
+            P_0(k) &=\left(1+\frac{2}{3}\beta+\frac{1}{5}\beta^2\right)\,P(k)
+            P_2(k) &=\left(\frac{4}{3}\beta+\frac{4}{7}\beta^2\right)\,P(k)
+            P_4(k) &=\frac{8}{35}\beta^2\,P(k)
         """
 
         # SJ: Set up power spectrum [note weirdly Cobaya has it as P(z,k)
         # SJ: instead of the more common P(k,z)]
-        Pk_interpolator = self.theory['Pk_interpolator']
-        Pk_delta = self.theory['Pk_delta']
         # SJ: For now, fix redshift (and scale),
         # fix galaxy bias = 1, and fix sigma8(z) = 1
         # Cobaya does not seem to allow for either growth
         # rate alone or sigma8 alone
         # to be called yet (only their combination).
-        b_gal = 1.0
         sigma8 = 1.0
         # compute Eqns 25-27
-        beta = self.theory['fsigma8'] / sigma8 / b_gal
-        Pk_gal = (b_gal**2.0) * \
+        beta = self.theory['fsigma8'] / sigma8 / self.theory['b_gal']
+        Pk_gal = (self.theory['b_gal']**2.0) * \
             self.theory['Pk_delta'].P(self.theory['zk'], 0.02)
-        P0k = (1.0 + 2.0 / 3.0 * beta + 1.0 / 5.0 * beta**2.0) * Pk_gal
-        P2k = (4.0 / 3.0 * beta + 4.0 / 7.0 * beta**2.0) * Pk_gal
-        P4k = (8.0 / 35.0 * beta**2.0) * Pk_gal
+        self.P0k = (1.0 + 2.0 / 3.0 * beta + 1.0 / 5.0 * beta**2.0) * Pk_gal
+        self.P2k = (4.0 / 3.0 * beta + 4.0 / 7.0 * beta**2.0) * Pk_gal
+        self.P4k = (8.0 / 35.0 * beta**2.0) * Pk_gal
 
         # (GCH): maybe save as attributes P0k, P2k, P4k?
 

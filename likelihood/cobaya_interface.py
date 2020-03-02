@@ -3,8 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Import loglike classes
-from photometric_survey.shear import Shear
-from spectroscopic_survey.spec import Spec
+from likelihood.photometric_survey.shear import Shear
+from likelihood.spectroscopic_survey.spec import Spec
 
 # Error classes
 
@@ -31,6 +31,8 @@ z_win = np.linspace(z_min, z_max, z_samp)
 # (GCH): value to be evaluated fsigma8
 zk = 0.5
 
+# SJ: temporary (should be varied in MCMC)
+b_gal = 1.0
 
 def loglike(like_selection=12,
             _theory={"Pk_interpolator": {"z": z_win,
@@ -80,6 +82,7 @@ def loglike(like_selection=12,
                   'Pk_delta': None,
                   'fsigma8': None,
                   'zk': zk,
+                  'b_gal': b_gal,
                   }
     theory_dic['Pk_delta'] = (theory_dic['Pk_interpolator']
                               ['delta_tot_delta_tot'])
@@ -116,7 +119,7 @@ def loglike(like_selection=12,
         loglike = loglike_shear + loglike_spec
     else:
         raise CobayaInterfaceError(
-            r"Choose like selection 'shear'or 'spec' or 'both'")
+            r"Choose like selection 'shear' or 'spec' or 'both'")
 
     # (GCH) loglike=-0.5*chi2
     return loglike
