@@ -26,15 +26,18 @@ class Spec:
         """
         self.theory = theory
 
-    def beta_eqs(self):
+    def multipole_spectra(self):
         """
         Computation of Eqns 25 - 27 of Euclid IST:L documentation
         (corresponding to multipole power spectra pre geometric distortions),
         found below:
             https://www.overleaf.com/read/pvfkzvvkymbj
         Eqns 25 - 27 shown in latex format below:
+        .. math::
             P_0(k) &=\left(1+\frac{2}{3}\beta+\frac{1}{5}\beta^2\right)\,P(k)
+
             P_2(k) &=\left(\frac{4}{3}\beta+\frac{4}{7}\beta^2\right)\,P(k)
+
             P_4(k) &=\frac{8}{35}\beta^2\,P(k)
         """
 
@@ -66,5 +69,5 @@ class Spec:
         """
         # SJ: This will be the log-likelihood;
         # for now just return P(z,k) for fixed z and k.
-        self.beta_eqs()
+        self.multipole_spectra()
         return self.theory['Pk_delta'].P(0.5, 0.02)
