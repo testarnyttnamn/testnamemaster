@@ -30,13 +30,12 @@ class Spec:
         r"""
         Computation of Eqns 25 - 27 of Euclid IST:L documentation
         (corresponding to multipole power spectra pre geometric distortions),
-        found below:
+        found below.
 
         https://www.overleaf.com/read/pvfkzvvkymbj
 
-        Eqns 25 - 27 shown in latex format below:
- 
-       .. math::
+        Eqns 25 - 27 shown in latex format below.
+        .. math::
             P_0(k) &=\left(1+\frac{2}{3}\beta+\frac{1}{5}\beta^2\right)\,P(k)
 
             P_2(k) &=\left(\frac{4}{3}\beta+\frac{4}{7}\beta^2\right)\,P(k)
