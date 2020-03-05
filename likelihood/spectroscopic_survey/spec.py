@@ -42,7 +42,6 @@ class Spec:
             P_2(k) &=\left(\frac{4}{3}\beta+\frac{4}{7}\beta^2\right)\,P(k)
 
             P_4(k) &=\frac{8}{35}\beta^2\,P(k)
-
         """
 
         # SJ: Set up power spectrum [note weirdly Cobaya has it as P(z,k)
