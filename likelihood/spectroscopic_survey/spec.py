@@ -50,9 +50,9 @@ class Spec:
         # Cobaya does not seem to allow for either growth
         # rate alone or sigma8 alone
         # to be called yet (only their combination).
-        sigma8 = 1.0
         # compute Eqns 25-27
-        beta = self.theory['fsigma8'] / sigma8 / self.theory['b_gal']
+        beta = self.theory['fsigma8'] / self.theory['sigma_8'] / \
+            self.theory['b_gal']
         Pk_gal = (self.theory['b_gal']**2.0) * \
             self.theory['Pk_delta'].P(self.theory['zk'], 0.02)
         self.P0k = (1.0 + 2.0 / 3.0 * beta + 1.0 / 5.0 * beta**2.0) * Pk_gal

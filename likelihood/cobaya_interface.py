@@ -34,6 +34,9 @@ zk = 0.5
 # SJ: temporary (should be varied in MCMC)
 b_gal = 1.0
 
+# SJ: temporary (needs to be obtained from Cobaya)
+sigma_8 = 1.0
+
 
 def loglike(like_selection=12,
             _theory={"Pk_interpolator": {"z": z_win,
@@ -84,6 +87,7 @@ def loglike(like_selection=12,
                   'fsigma8': None,
                   'zk': zk,
                   'b_gal': b_gal,
+                  'sigma_8': sigma_8,
                   }
     theory_dic['Pk_delta'] = (theory_dic['Pk_interpolator']
                               ['delta_tot_delta_tot'])
