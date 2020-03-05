@@ -35,12 +35,12 @@ class Spec:
         https://www.overleaf.com/read/pvfkzvvkymbj
 
         Eqns 25 - 27 shown in latex format below.
+
         .. math::
-            P_0(k) &=\left(1+\frac{2}{3}\beta+\frac{1}{5}\beta^2\right)\,P(k)
-
-            P_2(k) &=\left(\frac{4}{3}\beta+\frac{4}{7}\beta^2\right)\,P(k)
-
+            P_0(k) &=\left(1+\frac{2}{3}\beta+\frac{1}{5}\beta^2\right)\,P(k)\\
+            P_2(k) &=\left(\frac{4}{3}\beta+\frac{4}{7}\beta^2\right)\,P(k)\\
             P_4(k) &=\frac{8}{35}\beta^2\,P(k)
+
         """
 
         # SJ: Set up power spectrum [note weirdly Cobaya has it as P(z,k)
