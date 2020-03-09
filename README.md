@@ -10,20 +10,35 @@ Cobaya (code for bayesian analysis, and Spanish for Guinea Pig) is a framework f
 
 Check [documentation](https://cobaya.readthedocs.io/en/latest/index.html)
 
-### Install COBAYA
 
-Install Cobaya by simply running:
+### Stand alone build
 
-```bash
-pip install cobaya --upgrade
-```
-### Install modules for COBAYA (such as CAMB, CLASS, Polychord...)
-
-Check [instructions](https://cobaya.readthedocs.io/en/latest/installation_cosmo.html)
+The package can be installed by simply running:
 
 ```bash
-cobaya-install cosmo -m /path/to/modules
+python setup.py install
 ```
+
+### Conda environment
+
+To build the package in a dedicated Conda environment with development tools run:
+
+```bash
+conda env create -f environment.yml
+conda activate cosmobox
+python setup.py install
+```
+
+### Unit tests
+
+To run the unit tests locally run:
+
+```bash
+python setup.py test
+```
+
+Note that this requires the development tools.
+
 
 ### Calling external likelihood
 Open and play with ```likelihood_test.ipynb```
