@@ -1,0 +1,85 @@
+"""UNIT TESTS FOR THEORY
+
+This module contains unit tests for the theory module.
+=======
+
+"""
+
+from unittest import TestCase
+import numpy as np
+import numpy.testing as npt
+from scipy import integrate
+from ..theory import *
+
+
+class WLnzTestCase(TestCase):
+
+    def setUp(self):
+        self.nRBchecks = [0.023200287747794302, 0.3444277243561545,
+                          0.037586840798216704]
+        self.nfinchecks = [1.7212476944896058, 3.258728496592645,
+                           3.193587520650502]
+        self.concheck = 70.71084813162472
+
+    def tearDown(self):
+        self.nRBchecks = None
+        self.nfinchecks = None
+        self.concheck = None
+
+    def test_true_rb_nz(self):
+        shearshear = estimates.ShearShear([0.001, 0.418], [0.001, 0.418])
+        rb1 = shearshear.n_istf_int(0.1)
+        rb2 = shearshear.n_istf_int(1.0)
+        rb3 = shearshear.n_istf_int(2.0)
+        npt.assert_almost_equal([rb1, rb2, rb3],
+                                self.nRBchecks,
+                                err_msg='True unormalised n(z) from Euclid '
+                                        'RedBook is incorrect.')
+
+    def test_normalisation(self):
+        shearshear = estimates.ShearShear([0.001, 0.418], [0.001, 0.418])
+        proptest = (shearshear.n_istf(z=0.1, n_gal=30.0) /
+                    shearshear.n_istf_int(z=0.1))
+        npt.assert_almost_equal(proptest, self.concheck,
+                                err_msg='n(z) proportionality constant not'
+                                        'calculating correctly.')
+
+    def test_phot_p(self):
+        shearshear = estimates.ShearShear([0.001, 0.418], [0.001, 0.418])
+        zp_list = np.linspace(0.0, 1, 200)
+        ilist = []
+        for zp in zp_list:
+            ilist.append(shearshear.p_phot(zp=zp, z=0.5))
+        npt.assert_almost_equal(integrate.trapz(ilist, zp_list), 1.0,
+                                err_msg='Photo-z PDF not correctly normalised')
+
+    def test_fin_nz(self):
+        shearshear = estimates.ShearShear([0.001, 0.418], [0.001, 0.418])
+        nz1 = shearshear.n_i(0.2)
+        nz2 = shearshear.n_i(0.3)
+        nz3 = shearshear.n_i(0.4)
+        npt.assert_almost_equal([nz1, nz2, nz3],
+                                self.nfinchecks,
+                                err_msg='ISTF n(z) producing incorrect values')
+
+    def test_custom_nz_exp(self):
+        npt.assert_raises(Exception, estimates.ShearShear,
+                          [0.001, 0.418], [0.001, 0.418], 'custom')
+
+    def test_custom_no_bcols(self):
+        npt.assert_raises(Exception, estimates.ShearShear,
+                          [0.001, 0.418], [0.001, 0.418], 'custom',
+                          'test_fname')
+
+    def test_custom_wrong_bcols(self):
+        npt.assert_raises(ValueError, estimates.ShearShear,
+                          [0.001, 0.418], [0.001, 0.418], 'custom',
+                          'test_fname', 0)
+
+    def test_nz_choice(self):
+        npt.assert_raises(Exception, estimates.ShearShear,
+                          [0.001, 0.418], [0.001, 0.418], 'yeet')
+
+    def test_nz_value_err(self):
+        shearshear = estimates.ShearShear([0.001, 0.418], [0.001, 0.418])
+        npt.assert_raises(ValueError, shearshear.n_i, 4.2)
