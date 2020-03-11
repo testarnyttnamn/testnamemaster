@@ -1,4 +1,4 @@
-name: cosmobox
+name: likelihood
 channels:
   - conda-forge
   - defaults
@@ -9,8 +9,9 @@ dependencies:
   - pip>=19.0
   - scipy>=1.3
   - jupyter>=1.0
+  - camb>=1.0
   - pip:
-    - camb>=1.0
+    - cobaya
     - pytest
     - pytest-cov
     - pytest-pep8

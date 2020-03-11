@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""COSMOBOX INFO
+"""LIKELIHOOD INFO
 
 This module provides some basic information about the package.
 
