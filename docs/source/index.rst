@@ -10,4 +10,5 @@ Package Contents
    :numbered:
    :maxdepth: 3
 
+   example
    likelihood
