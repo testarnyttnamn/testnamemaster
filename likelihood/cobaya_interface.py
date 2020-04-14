@@ -120,14 +120,14 @@ def loglike(like_selection=12,
     # (GCH) Select with class to work with based on like_selection
     # (GCH) Within each if-statement, compute loglike
     if like_selection.lower() == "shear":
-        shear_ins = Shear(theory=theory_dic)
+        shear_ins = Shear()
         loglike = shear_ins.loglike()
     elif like_selection.lower() == "spec":
-        spec_ins = Spec(theory=theory_dic)
+        spec_ins = Spec()
         loglike = spec_ins.loglike()
     elif like_selection.lower() == 'both':
-        shear_ins = Shear(theory=theory_dic)
-        spec_ins = Spec(theory=theory_dic)
+        shear_ins = Shear()
+        spec_ins = Spec()
         loglike_shear = shear_ins.loglike()
         loglike_spec = spec_ins.loglike()
         loglike = loglike_shear + loglike_spec
