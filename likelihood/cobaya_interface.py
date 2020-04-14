@@ -38,6 +38,9 @@ b_gal = 1.0
 # SJ: temporary (needs to be obtained from Cobaya)
 sigma_8 = 1.0
 
+# Initialise cosmological parameter dictionary
+likelihood.cosmo.cosmology.initialiseparamlist()
+
 
 def loglike(like_selection=12,
             _theory={"Pk_interpolator": {"z": z_win,
@@ -103,7 +106,6 @@ def loglike(like_selection=12,
     # only way to store them in the 'cosmo' module is to pass them from here,
     # like so:
 
-    likelihood.cosmo.cosmology.initialiseparamlist()
     likelihood.cosmo.cosmology.cosmoparamdict = theory_dic
 
     # (GCH) Define loglike variable
