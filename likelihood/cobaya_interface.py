@@ -1,6 +1,7 @@
 # General import
 import numpy as np
 import matplotlib.pyplot as plt
+import likelihood.cosmo
 
 # Import loglike classes
 from likelihood.photometric_survey.shear import Shear
@@ -96,6 +97,14 @@ def loglike(like_selection=12,
     # (GCH): Careful! In the future, there should be a
     # way to retrieving _derived
     # (GCH): parameters
+
+    # (ACD): As I understand it from Cobaya docs, _theory.get_param
+    # only works from within the likelihood function (this one). So the
+    # only way to store them in the 'cosmo' module is to pass them from here,
+    # like so:
+
+    likelihood.cosmo.cosmology.initialiseparamlist()
+    likelihood.cosmo.cosmology.cosmoparamdict = theory_dic
 
     # (GCH) Define loglike variable
     loglike = 0.0
