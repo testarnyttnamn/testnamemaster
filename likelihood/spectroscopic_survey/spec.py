@@ -6,6 +6,7 @@ Prototype computation of spectroscopic galaxy clustering likelihood.
 
 # Global
 import numpy as np
+import likelihood.cosmo
 
 # Import auxilary classes
 # (GCH): for instance, estimates from general_specs
@@ -16,15 +17,13 @@ class Spec:
     Class for GC spectroscopy observable
     """
 
-    def __init__(self, theory):
+    def __init__(self):
         """
         Parameters
         ----------
-        theory: dictionary
-               Theory needs from COBAYA
-               updates the content of self.theory
+        None
         """
-        self.theory = theory
+        self.theory = likelihood.cosmo.cosmology.cosmoparamdict
 
     def multipole_spectra(self):
         r"""

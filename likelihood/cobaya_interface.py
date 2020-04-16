@@ -1,6 +1,7 @@
 # General import
 import numpy as np
 import matplotlib.pyplot as plt
+import likelihood.cosmo
 
 # Import loglike classes
 from likelihood.photometric_survey.shear import Shear
@@ -36,6 +37,9 @@ b_gal = 1.0
 
 # SJ: temporary (needs to be obtained from Cobaya)
 sigma_8 = 1.0
+
+# Initialise cosmological parameter dictionary
+likelihood.cosmo.cosmology.initialiseparamlist()
 
 
 def loglike(like_selection=12,
@@ -97,6 +101,13 @@ def loglike(like_selection=12,
     # way to retrieving _derived
     # (GCH): parameters
 
+    # (ACD): As I understand it from Cobaya docs, _theory.get_param
+    # only works from within the likelihood function (this one). So the
+    # only way to store them in the 'cosmo' module is to pass them from here,
+    # like so:
+
+    likelihood.cosmo.cosmology.cosmoparamdict = theory_dic
+
     # (GCH) Define loglike variable
     loglike = 0.0
     # (GCH): issue with cobaya to pass strings to external likelihood
@@ -111,14 +122,14 @@ def loglike(like_selection=12,
     # (GCH) Select with class to work with based on like_selection
     # (GCH) Within each if-statement, compute loglike
     if like_selection.lower() == "shear":
-        shear_ins = Shear(theory=theory_dic)
+        shear_ins = Shear()
         loglike = shear_ins.loglike()
     elif like_selection.lower() == "spec":
-        spec_ins = Spec(theory=theory_dic)
+        spec_ins = Spec()
         loglike = spec_ins.loglike()
     elif like_selection.lower() == 'both':
-        shear_ins = Shear(theory=theory_dic)
-        spec_ins = Spec(theory=theory_dic)
+        shear_ins = Shear()
+        spec_ins = Spec()
         loglike_shear = shear_ins.loglike()
         loglike_spec = spec_ins.loglike()
         loglike = loglike_shear + loglike_spec
