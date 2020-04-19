@@ -6,24 +6,19 @@ Prototype computation of spectroscopic galaxy clustering likelihood.
 
 # Global
 import numpy as np
-import likelihood.cosmo
-
-# Import auxilary classes
-# (GCH): for instance, estimates from general_specs
-
 
 class Spec:
     """
     Class for GC spectroscopy observable
     """
 
-    def __init__(self):
+    def __init__(self, cosmo_dic):
         """
         Parameters
         ----------
         None
         """
-        self.theory = likelihood.cosmo.cosmology.cosmoparamdict
+        self.theory = cosmo_dic
 
     def multipole_spectra(self):
         r"""

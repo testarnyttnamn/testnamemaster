@@ -1,11 +1,11 @@
 # General import
 import numpy as np
 import matplotlib.pyplot as plt
-import likelihood.cosmo
 
-# Import loglike classes
+# Import likelihoods classes
 from likelihood.photometric_survey.shear import Shear
 from likelihood.spectroscopic_survey.spec import Spec
+from likelihood.cosmo.cosmology import Cosmology
 
 # Error classes
 
@@ -105,9 +105,12 @@ def loglike(like_selection=12,
     # only works from within the likelihood function (this one). So the
     # only way to store them in the 'cosmo' module is to pass them from here,
     # like so:
+    # (GCH): Updated from ACD. cosmology is a class now
+    # Cosmology will calculate growth factor and rate too
 
-    likelihood.cosmo.cosmology.cosmoparamdict = theory_dic
-
+    cosmo_theory = Cosmology(theory_dic)
+    
+    
     # (GCH) Define loglike variable
     loglike = 0.0
     # (GCH): issue with cobaya to pass strings to external likelihood
@@ -122,14 +125,14 @@ def loglike(like_selection=12,
     # (GCH) Select with class to work with based on like_selection
     # (GCH) Within each if-statement, compute loglike
     if like_selection.lower() == "shear":
-        shear_ins = Shear()
+        shear_ins = Shear(cosmo_theory)
         loglike = shear_ins.loglike()
     elif like_selection.lower() == "spec":
-        spec_ins = Spec()
+        spec_ins = Spec(cosmo_theory)
         loglike = spec_ins.loglike()
     elif like_selection.lower() == 'both':
-        shear_ins = Shear()
-        spec_ins = Spec()
+        shear_ins = Shear(cosmo_theory)
+        spec_ins = Spec(cosmo_theory)
         loglike_shear = shear_ins.loglike()
         loglike_spec = spec_ins.loglike()
         loglike = loglike_shear + loglike_spec

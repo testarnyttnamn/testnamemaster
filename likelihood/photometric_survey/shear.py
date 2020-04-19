@@ -11,12 +11,12 @@ class Shear:
     Class for Shear observable
     """
 
-    def __init__(self):
+    def __init__(self, cosmo_dic):
         """
         Parameters
         ----------
         """
-        self.theory = likelihood.cosmo.cosmology.cosmoparamdict
+        self.theory = cosmo_dic
 
     def loglike(self):
         """
