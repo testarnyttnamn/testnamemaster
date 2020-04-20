@@ -8,9 +8,9 @@ Prototype computation of spectroscopic galaxy clustering likelihood.
 import numpy as np
 
 class Spec:
-    """
-    Class for GC spectroscopy observable
-    """
+"""
+Class for GC spectroscopy observable
+"""
 
     def __init__(self, cosmo_dic):
         """
