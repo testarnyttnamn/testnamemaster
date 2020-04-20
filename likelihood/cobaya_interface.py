@@ -38,9 +38,6 @@ b_gal = 1.0
 # SJ: temporary (needs to be obtained from Cobaya)
 sigma_8 = 1.0
 
-# Initialise cosmological parameter dictionary
-likelihood.cosmo.cosmology.initialiseparamlist()
-
 
 def loglike(like_selection=12,
             _theory={"Pk_interpolator": {"z": z_win,
@@ -108,9 +105,8 @@ def loglike(like_selection=12,
     # (GCH): Updated from ACD. cosmology is a class now
     # Cosmology will calculate growth factor and rate too
 
-    cosmo_theory = Cosmology(theory_dic)
-    
-    
+    cosmo = Cosmology(theory_dic)
+    cosmo_theory = cosmo.cosmo_dic
     # (GCH) Define loglike variable
     loglike = 0.0
     # (GCH): issue with cobaya to pass strings to external likelihood

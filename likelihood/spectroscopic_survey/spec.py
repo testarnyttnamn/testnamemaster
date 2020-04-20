@@ -7,10 +7,11 @@ Prototype computation of spectroscopic galaxy clustering likelihood.
 # Global
 import numpy as np
 
+
 class Spec:
-"""
-Class for GC spectroscopy observable
-"""
+    """
+    Class for GC spectroscopy observable
+    """
 
     def __init__(self, cosmo_dic):
         """
@@ -19,6 +20,7 @@ Class for GC spectroscopy observable
         None
         """
         self.theory = cosmo_dic
+        print(cosmo_dic)
 
     def multipole_spectra(self):
         r"""
