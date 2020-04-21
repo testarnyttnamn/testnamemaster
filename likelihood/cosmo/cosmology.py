@@ -16,7 +16,7 @@ class CosmologyError(Exception):
 
 class Cosmology:
     """
-    Class for GC spectroscopy observable
+    Class for cosmological observables
     """
 
     def __init__(self, cobaya_dic):
@@ -30,10 +30,10 @@ class Cosmology:
 
     def growth_factor(self, zs, ks):
         """
-        Calculates growth factor according as
+        Calculates growth factor according to
 
         .. math::
-                   D(z) &=\sqrt{P(z, k)/P(z=0, k)}\\
+                   D(z, k) &=\sqrt{P(z, k)/P(z=0, k)}\\
 
         Parameters
         ----------
@@ -51,16 +51,19 @@ class Cosmology:
         # we want to obtain delta directly from Cobaya
         # (in process)
         # This quantity depends on z and k
-        D_z_k = self.cosmo_dic['Pk_delta'].P(zs, ks)
-        D_z_k = np.sqrt(D_z_k / self.cosmo_dic['Pk_delta'].P(0.0001, ks))
-        return D_z_k
+        try:
+            D_z_k = self.cosmo_dic['Pk_delta'].P(zs, ks)
+            D_z_k = np.sqrt(D_z_k / self.cosmo_dic['Pk_delta'].P(0.0001, ks))
+            return D_z_k
+        except CosmologyError:
+            print('Computation error in D(z, k)')
 
     def growth_rate(self, zs, ks):
         """
-        Calculates growth rate according as
+        Calculates growth rate according to
 
         .. math::
-                   f(z, k) &=-(1+z)dD(z, k)/dz\\
+                   f(z, k) &=-(1+z)/D dD(z, k)/dz\\
 
         Parameters
         ----------
@@ -82,10 +85,11 @@ class Cosmology:
         D_z_k = self.growth_factor(zs, ks)
         # This will work when k is fixed, not an array
         try:
-            f_z_k = -(1 + zs) * np.gradient(D_z_k)
+            f_z_k = -(1 + zs) * np.gradient(D_z_k) / D_z_k
             return f_z_k
         except CosmologyError:
-            print('Check k is a value, not a list')
+            print('Computation error in f(z, k)')
+            print('ATTENTION: Check k is a value, not a list')
 
     def update_cosmo_dic(self, zs, ks):
         """
@@ -106,9 +110,5 @@ class Cosmology:
         # (GCH): this function is superfluous
         # just in case we want to have always
         # an updated dictionary with D_z and f
-        try:
-            self.cosmo_dic['D_z_k'] = self.growth_factor(zs, ks)
-            self.cosmo_dic['f_z_k'] = self.growth_rate(zs, ks)
-        except CosmologyError:
-            print(
-                r"Computation error in growth factor")
+        self.cosmo_dic['D_z_k'] = self.growth_factor(zs, ks)
+        self.cosmo_dic['f_z_k'] = self.growth_rate(zs, ks)

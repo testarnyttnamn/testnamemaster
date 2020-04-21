@@ -20,7 +20,6 @@ class Spec:
         None
         """
         self.theory = cosmo_dic
-        print(cosmo_dic)
 
     def multipole_spectra(self):
         r"""
