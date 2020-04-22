@@ -13,6 +13,7 @@ class Galdist:
     """
     Class for cosmic shear observables.
     """
+
     def __init__(self, bin_i, bin_j, n_type='istf', n_file=None, bcols=None,
                  survey_lims=[0.001, 4.0], **kwargs):
         """
@@ -55,14 +56,10 @@ class Galdist:
                                  'bcols > 0.')
             else:
                 ntab = np.loadtxt(n_file)
-                self.n_i = interpolate.InterpolatedUnivariateSpline(ntab[:, 0],
-                                                                    ntab[:,
-                                                                    bcols[0]],
-                                                                    ext=2)
-                self.n_j = interpolate.InterpolatedUnivariateSpline(ntab[:, 0],
-                                                                    ntab[:,
-                                                                    bcols[1]],
-                                                                    ext=2)
+                self.n_i = interpolate.InterpolatedUnivariateSpline(
+                    ntab[:, 0], ntab[:, bcols[0]], ext=2)
+                self.n_j = interpolate.InterpolatedUnivariateSpline(
+                    ntab[:, 0], ntab[:, bcols[1]], ext=2)
         else:
             raise Exception('n_type must be istf or custom.')
 
@@ -159,9 +156,9 @@ class Galdist:
         """
 
         fac1 = ((1.0 - outlier_frac) / (np.sqrt(2.0 * np.pi) *
-                sigma_b * (1.0 + z)))
+                                        sigma_b * (1.0 + z)))
         fac2 = (outlier_frac / (np.sqrt(2.0 * np.pi) *
-                sigma_outlier * (1.0 + z)))
+                                sigma_outlier * (1.0 + z)))
 
         p_val = ((fac1 * np.exp((-0.5) * ((z - (c_b * z_photo) - z_b) /
                                           (sigma_b * (1.0 + z)))**2.0)) +
