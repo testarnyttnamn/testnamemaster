@@ -19,14 +19,27 @@ class Cosmology:
     Class for cosmological observables
     """
 
-    def __init__(self, cobaya_dic):
+    def __init__(self):
         """
         Parameters
         ----------
-        cobaya_dic: dictionary
-                    cosmological quantities from cobaya
+        None
+
         """
-        self.cosmo_dic = cobaya_dic
+        # (GCH): initialize cosmo dictionary
+        self.cosmo_dic = {'H0': 67.5,
+                          'omch2': 0.122,
+                          'ombh2': 0.022,
+                          'mnu': 0.06,
+                          'comov_dist': None,
+                          'H': None,
+                          'Pk_interpolator': None,
+                          'Pk_delta': None,
+                          'fsigma8': None,
+                          'zk': None,
+                          'b_gal': None,
+                          'sigma_8': None,
+                          }
 
     def growth_factor(self, zs, ks):
         """

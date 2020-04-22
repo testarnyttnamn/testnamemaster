@@ -34,21 +34,27 @@ class cosmoinitTestCase(TestCase):
         }
         model = get_model(info)
         model.logposterior({})
-        theory_dic = {
-            'H0': model.parameterization.constant_params()['H0'],
-            'omch2': model.parameterization.constant_params()['omch2'],
-            'ombh2': model.parameterization.constant_params()['ombh2'],
-            'mnu': model.parameterization.constant_params()['mnu'],
-            'comov_dist':
-            model.likelihood.theory.get_comoving_radial_distance(self.z_win),
-            'H': model.likelihood.theory.get_H(self.z_win),
-            'Pk_interpolator': model.likelihood.theory.get_Pk_interpolator(),
-            'Pk_delta': None,
-            'fsigma8': None}
-        theory_dic['Pk_delta'] = (theory_dic['Pk_interpolator']
-                                  ['delta_tot_delta_tot'])
-        theory_dic['fsigma8'] = model.likelihood.theory.get_fsigma8(self.z_win)
-        self.cosmology = Cosmology(theory_dic)
+        self.cosmology = Cosmology()
+        self.cosmology.cosmo_dic['H0'] = \
+            model.parameterization.constant_params()['H0']
+        self.cosmology.cosmo_dic['omch2'] =  \
+            model.parameterization.constant_params()['omch2']
+        self.cosmology.cosmo_dic['ombh2'] = \
+            model.parameterization.constant_params()['ombh2']
+        self.cosmology.cosmo_dic['mnu'] = \
+            model.parameterization.constant_params()['mnu']
+        self.cosmology.cosmo_dic['comov_dist'] = \
+            model.likelihood.theory.get_comoving_radial_distance(
+            self.z_win)
+        self.cosmology.cosmo_dic['H'] = model.likelihood.theory.get_H(
+            self.z_win)
+        self.cosmology.cosmo_dic['Pk_interpolator'] = \
+            model.likelihood.theory.get_Pk_interpolator()
+        self.cosmology.cosmo_dic['Pk_delta'] = \
+            (self.cosmology.cosmo_dic['Pk_interpolator']
+                ['delta_tot_delta_tot'])
+        self.cosmology.cosmo_dic['fsigma8'] = \
+            model.likelihood.theory.get_fsigma8(self.z_win)
         # (GCH): checks
         self.H0check = 68.0
         self.Dcheck = 1.0

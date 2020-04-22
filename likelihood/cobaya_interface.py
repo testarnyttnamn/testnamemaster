@@ -77,23 +77,7 @@ def loglike(like_selection=12,
     # (GCH): re-define _theory needs of COBAYA
     # (GCH): I guess that this can be made automatically asking
     # (GCH): the theory code which parameters it has... search for it!!
-    theory_dic = {'H0': _theory.get_param("H0"),
-                  'omch2': _theory.get_param('omch2'),
-                  'ombh2': _theory.get_param('ombh2'),
-                  'mnu': _theory.get_param('mnu'),
-                  'comov_dist': _theory.get_comoving_radial_distance(z_win),
-                  'H': _theory.get_H(z_win),
-                  'Pk_interpolator': _theory.get_Pk_interpolator(),
-                  'Pk_delta': None,
-                  'fsigma8': None,
-                  'zk': zk,
-                  'b_gal': b_gal,
-                  'sigma_8': sigma_8,
-                  }
-    theory_dic['Pk_delta'] = (theory_dic['Pk_interpolator']
-                              ['delta_tot_delta_tot'])
-    theory_dic['fsigma8'] = _theory.get_fsigma8(theory_dic['zk'])
-
+    # (GCH): for the moment, this is
     # (GCH): Careful! In the future, there should be a
     # way to retrieving _derived
     # (GCH): parameters
@@ -105,9 +89,27 @@ def loglike(like_selection=12,
     # (GCH): Updated from ACD. cosmology is a class now
     # Cosmology will calculate growth factor and rate too
 
-    cosmo = Cosmology(theory_dic)
-    cosmo_theory = cosmo.cosmo_dic
-    # (GCH) Define loglike variable
+    cosmo = Cosmology()
+    try:
+        cosmo.cosmology_dic['H0'] = _theory.get_param("H0")
+        cosmo.cosmology_dic['omch2'] = _theory.get_param('omch2')
+        cosmo.cosmology_dic['ombh2'] = _theory.get_param('ombh2')
+        cosmo.cosmology_dic['mnu'] = _theory.get_param('mnu')
+        cosmo.cosmology_dic['comov_dis'] = \
+            _theory.get_comoving_radial_distance(z_win)
+        cosmo.cosmology_dic['H'] = _theory.get_H(z_win)
+        cosmo.cosmology_dic['Pk_interpolator'] = _theory.get_Pk_interpolator()
+        cosmo.cosmology_dic['zk'] = zk
+        cosmo.cosmology_dic['b_gal'] = b_gal
+        cosmo.cosmology_dic['sigma_8'] = sigma_8
+        cosmo.cosmology_dic['Pk_delta'] = (
+            cosmo.cosmology_dic['Pk_interpolator']['delta_tot_delta_tot'])
+        cosmo.cosmology_dic['fsigma8'] = _theory.get_fsigma8(
+            cosmo.cosmology_dic['zk'])
+    except CobayaInterfaceError:
+        print('Cobaya theory needs could not be pass to cosmo module')
+
+    # (GCH): loglike computation
     loglike = 0.0
     # (GCH): issue with cobaya to pass strings to external likelihood
     # as parameter
@@ -121,14 +123,14 @@ def loglike(like_selection=12,
     # (GCH) Select with class to work with based on like_selection
     # (GCH) Within each if-statement, compute loglike
     if like_selection.lower() == "shear":
-        shear_ins = Shear(cosmo_theory)
+        shear_ins = Shear(cosmo.cosmology_dic)
         loglike = shear_ins.loglike()
     elif like_selection.lower() == "spec":
-        spec_ins = Spec(cosmo_theory)
+        spec_ins = Spec(cosmo.cosmology_dic)
         loglike = spec_ins.loglike()
     elif like_selection.lower() == 'both':
-        shear_ins = Shear(cosmo_theory)
-        spec_ins = Spec(cosmo_theory)
+        shear_ins = Shear(cosmo.cosmology_dic)
+        spec_ins = Spec(cosmo.cosmology_dic)
         loglike_shear = shear_ins.loglike()
         loglike_spec = spec_ins.loglike()
         loglike = loglike_shear + loglike_spec
