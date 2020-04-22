@@ -24,7 +24,7 @@ k_samp = 100
 k_win = np.linspace(k_min, k_max, k_samp)
 
 # SJ: For now, example sampling in redshift (z)
-z_min = 0.001
+z_min = 0.0
 z_max = 2.5
 z_samp = 10
 z_win = np.linspace(z_min, z_max, z_samp)
@@ -91,21 +91,21 @@ def loglike(like_selection=12,
 
     cosmo = Cosmology()
     try:
-        cosmo.cosmology_dic['H0'] = _theory.get_param("H0")
-        cosmo.cosmology_dic['omch2'] = _theory.get_param('omch2')
-        cosmo.cosmology_dic['ombh2'] = _theory.get_param('ombh2')
-        cosmo.cosmology_dic['mnu'] = _theory.get_param('mnu')
-        cosmo.cosmology_dic['comov_dis'] = \
+        cosmo.cosmo_dic['H0'] = _theory.get_param("H0")
+        cosmo.cosmo_dic['omch2'] = _theory.get_param('omch2')
+        cosmo.cosmo_dic['ombh2'] = _theory.get_param('ombh2')
+        cosmo.cosmo_dic['mnu'] = _theory.get_param('mnu')
+        cosmo.cosmo_dic['comov_dis'] = \
             _theory.get_comoving_radial_distance(z_win)
-        cosmo.cosmology_dic['H'] = _theory.get_H(z_win)
-        cosmo.cosmology_dic['Pk_interpolator'] = _theory.get_Pk_interpolator()
-        cosmo.cosmology_dic['zk'] = zk
-        cosmo.cosmology_dic['b_gal'] = b_gal
-        cosmo.cosmology_dic['sigma_8'] = sigma_8
-        cosmo.cosmology_dic['Pk_delta'] = (
-            cosmo.cosmology_dic['Pk_interpolator']['delta_tot_delta_tot'])
-        cosmo.cosmology_dic['fsigma8'] = _theory.get_fsigma8(
-            cosmo.cosmology_dic['zk'])
+        cosmo.cosmo_dic['H'] = _theory.get_H(z_win)
+        cosmo.cosmo_dic['Pk_interpolator'] = _theory.get_Pk_interpolator()
+        cosmo.cosmo_dic['zk'] = zk
+        cosmo.cosmo_dic['b_gal'] = b_gal
+        cosmo.cosmo_dic['sigma_8'] = sigma_8
+        cosmo.cosmo_dic['Pk_delta'] = (
+            cosmo.cosmo_dic['Pk_interpolator']['delta_tot_delta_tot'])
+        cosmo.cosmo_dic['fsigma8'] = _theory.get_fsigma8(
+            cosmo.cosmo_dic['zk'])
     except CobayaInterfaceError:
         print('Cobaya theory needs could not be pass to cosmo module')
 
@@ -123,14 +123,14 @@ def loglike(like_selection=12,
     # (GCH) Select with class to work with based on like_selection
     # (GCH) Within each if-statement, compute loglike
     if like_selection.lower() == "shear":
-        shear_ins = Shear(cosmo.cosmology_dic)
+        shear_ins = Shear(cosmo.cosmo_dic)
         loglike = shear_ins.loglike()
     elif like_selection.lower() == "spec":
-        spec_ins = Spec(cosmo.cosmology_dic)
+        spec_ins = Spec(cosmo.cosmo_dic)
         loglike = spec_ins.loglike()
     elif like_selection.lower() == 'both':
-        shear_ins = Shear(cosmo.cosmology_dic)
-        spec_ins = Spec(cosmo.cosmology_dic)
+        shear_ins = Shear(cosmo.cosmo_dic)
+        spec_ins = Spec(cosmo.cosmo_dic)
         loglike_shear = shear_ins.loglike()
         loglike_spec = spec_ins.loglike()
         loglike = loglike_shear + loglike_spec

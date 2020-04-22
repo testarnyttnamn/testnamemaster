@@ -20,7 +20,7 @@ class cosmoinitTestCase(TestCase):
 
     def setUp(self):
         # SJ: For now, example sampling in redshift (z)
-        z_min = 0.001
+        z_min = 0.0
         z_max = 2.5
         z_samp = 10
         self.z_win = np.linspace(z_min, z_max, z_samp)
@@ -77,7 +77,7 @@ class cosmoinitTestCase(TestCase):
                                         'failed')
 
     def test_cosmo_growth_factor(self):
-        D = self.cosmology.growth_factor(0.0001, 0.002)
+        D = self.cosmology.growth_factor(0.0, 0.002)
         npt.assert_equal(D, self.Dcheck,
                          err_msg='Error in D_z_k calculation ')
 
