@@ -51,6 +51,9 @@ Open and play with ```likelihood_test.ipynb```
     *  ```cobaya_interface.py```: interface with COBAYA, pass theory needs to other classes, returns loglike  
     * test: unit tests to check likelihood code
         *   ```test_estimates.py```: class with unit tests for common class estimate.py
+        *   ```test_cosmo.py```: class with unit tests for cosmology class cosmology.py
+     * cosmo: cosmology module which takes cosmological parameters and theory needs from Cobaya
+        *   ```cosmology.py```: class with cosmological functions
                                       
     * general_specs: general module with common aux functions useful for both WL and GC
         *   ```estimates.py```
