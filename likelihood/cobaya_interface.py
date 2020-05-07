@@ -106,6 +106,7 @@ def loglike(like_selection=12,
             cosmo.cosmo_dic['Pk_interpolator']['delta_tot_delta_tot'])
         cosmo.cosmo_dic['fsigma8'] = _theory.get_fsigma8(
             cosmo.cosmo_dic['zk'])
+        cosmo.interp_comoving_dist(z_win)
     except CobayaInterfaceError:
         print('Cobaya theory needs could not be pass to cosmo module')
 

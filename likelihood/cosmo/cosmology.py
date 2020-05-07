@@ -5,6 +5,7 @@ Class to store cosmological parameters and functions.
 """
 
 import numpy as np
+from scipy import interpolate
 
 
 class CosmologyError(Exception):
@@ -27,6 +28,8 @@ class Cosmology:
 
         """
         # (GCH): initialize cosmo dictionary
+        # (ACD): Added speed of light to dictionary.!!!Important:it's in units
+        # of km/s to be dimensionally consistent with H0.!!!!
         self.cosmo_dic = {'H0': 67.5,
                           'omch2': 0.122,
                           'ombh2': 0.022,
@@ -39,7 +42,7 @@ class Cosmology:
                           'zk': None,
                           'b_gal': None,
                           'sigma_8': None,
-                          }
+                          'c':3.0e5}
 
     def growth_factor(self, zs, ks):
         """
@@ -125,3 +128,20 @@ class Cosmology:
         # an updated dictionary with D_z and f
         self.cosmo_dic['D_z_k'] = self.growth_factor(zs, ks)
         self.cosmo_dic['f_z_k'] = self.growth_rate(zs, ks)
+
+    def interp_comoving_dist(self, zs):
+        """
+        Adds an interpolator for comoving distance to the dictionary so that
+        it can be evaluated at redshifts not explictly supplied to cobaya.
+
+        Parameters
+        ----------
+        zs: array
+            list of redshift comoving distance is evaluated at.
+        Returns
+        -------
+        None
+
+        """
+        self.cosmo_dic['r_z_func'] = interpolate.InterpolatedUnivariateSpline(
+            x=zs, y=self.cosmo_dic['comov_dis'], ext=2)
