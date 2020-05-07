@@ -42,7 +42,7 @@ class Cosmology:
                           'zk': None,
                           'b_gal': None,
                           'sigma_8': None,
-                          'c':3.0e5}
+                          'c': 3.0e5}
 
     def growth_factor(self, zs, ks):
         """

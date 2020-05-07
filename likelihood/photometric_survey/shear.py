@@ -46,7 +46,7 @@ class Shear:
         Integrand value
         """
 
-        wint = nz(zprime) * (1.0 - (self.theory['r_z_func'](z)/
+        wint = nz(zprime) * (1.0 - (self.theory['r_z_func'](z) /
                                     self.theory['r_z_func'](zprime)))
         return wint
 
@@ -67,10 +67,11 @@ class Shear:
         """
         H0 = self.theory['H0']
         c = self.theory['c']
-        O_m = ((self.theory['omch2']/(H0/100.0)**2.0) +
-               (self.theory['omch2']/(H0/100.0)**2.0))
+        O_m = ((self.theory['omch2'] / (H0 / 100.0)**2.0) +
+               (self.theory['omch2'] / (H0 / 100.0)**2.0))
         # (ACD): Note that impact of MG is currently neglected (\Sigma=1).
-        W_val = (1.5 * (H0/c) * O_m * (1.0 + z) * (self.theory['r_z_func'](z)/
-                (c/H0)) * integrate.quad(self.w_gamma_integrand, a=0.0,
-                                         b=2.5, args=(z, tomo_bin)))[0]
+        W_val = (1.5 * (H0 / c) * O_m * (1.0 + z) * (
+                self.theory['r_z_func'](z) /
+                (c / H0)) * integrate.quad(self.w_gamma_integrand, a=0.0,
+                                           b=2.5, args=(z, tomo_bin)))[0]
         return W_val

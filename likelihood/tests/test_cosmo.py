@@ -99,7 +99,7 @@ class cosmoinitTestCase(TestCase):
                          err_msg='f_z_k not calculated ')
 
     def test_cosmo_comov_dist_interp(self):
-        self.cosmology.cosmo_dic.interp_comoving_dist(self.z_win)
+        self.cosmology.interp_comoving_dist(self.z_win)
         npt.assert_almost_equal(self.cosmology.cosmo_dic['comov_dist'][1],
                                 self.cosmology.cosmo_dic['r_z_func']
                                 (self.z_win[1]),
