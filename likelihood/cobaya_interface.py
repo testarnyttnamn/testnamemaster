@@ -95,7 +95,7 @@ def loglike(like_selection=12,
         cosmo.cosmo_dic['omch2'] = _theory.get_param('omch2')
         cosmo.cosmo_dic['ombh2'] = _theory.get_param('ombh2')
         cosmo.cosmo_dic['mnu'] = _theory.get_param('mnu')
-        cosmo.cosmo_dic['comov_dis'] = \
+        cosmo.cosmo_dic['comov_dist'] = \
             _theory.get_comoving_radial_distance(z_win)
         cosmo.cosmo_dic['H'] = _theory.get_H(z_win)
         cosmo.cosmo_dic['Pk_interpolator'] = _theory.get_Pk_interpolator()

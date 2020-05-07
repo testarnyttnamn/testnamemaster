@@ -73,5 +73,5 @@ class Shear:
         W_val = (1.5 * (H0 / c) * O_m * (1.0 + z) * (
                 self.theory['r_z_func'](z) /
                 (c / H0)) * integrate.quad(self.w_gamma_integrand, a=0.0,
-                                           b=2.5, args=(z, tomo_bin)))[0]
+                                           b=2.5, args=(z, tomo_bin))[0])
         return W_val
