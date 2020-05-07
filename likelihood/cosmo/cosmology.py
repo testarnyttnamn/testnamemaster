@@ -145,4 +145,3 @@ class Cosmology:
         """
         self.cosmo_dic['r_z_func'] = interpolate.InterpolatedUnivariateSpline(
             x=zs, y=self.cosmo_dic['comov_dist'], ext=2)
-
