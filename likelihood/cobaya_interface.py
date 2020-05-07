@@ -1,6 +1,7 @@
 # General import
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.interpolate import UnivariateSpline
 
 # Import likelihoods classes
 from likelihood.photometric_survey.shear import Shear
@@ -43,7 +44,7 @@ def loglike(like_selection=12,
             _theory={"Pk_interpolator": {"z": z_win,
                                          "k_max": k_max,
                                          "extrap_kmax": 2,
-                                         "nonlinear": True,
+                                         "nonlinear": False,
                                          "vars_pairs": ([["delta_tot",
                                                           "delta_tot"]])},
                      "comoving_radial_distance": {"z": z_win},
@@ -97,7 +98,7 @@ def loglike(like_selection=12,
         cosmo.cosmo_dic['mnu'] = _theory.get_param('mnu')
         cosmo.cosmo_dic['comov_dis'] = \
             _theory.get_comoving_radial_distance(z_win)
-        cosmo.cosmo_dic['H'] = _theory.get_H(z_win)
+        cosmo.cosmo_dic['H'] = UnivariateSpline(z_win, _theory.get_H(z_win))
         cosmo.cosmo_dic['Pk_interpolator'] = _theory.get_Pk_interpolator()
         cosmo.cosmo_dic['zk'] = zk
         cosmo.cosmo_dic['b_gal'] = b_gal

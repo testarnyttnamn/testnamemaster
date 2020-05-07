@@ -14,6 +14,7 @@ import numpy.testing as npt
 from scipy import integrate
 from ..cosmo.cosmology import Cosmology
 from likelihood.cobaya_interface import loglike
+from scipy.interpolate import UnivariateSpline
 
 
 class cosmoinitTestCase(TestCase):
@@ -46,8 +47,8 @@ class cosmoinitTestCase(TestCase):
         self.cosmology.cosmo_dic['comov_dist'] = \
             model.likelihood.theory.get_comoving_radial_distance(
             self.z_win)
-        self.cosmology.cosmo_dic['H'] = model.likelihood.theory.get_H(
-            self.z_win)
+        self.cosmology.cosmo_dic['H'] = UnivariateSpline(
+            self.z_win, model.likelihood.theory.get_H(self.z_win))
         self.cosmology.cosmo_dic['Pk_interpolator'] = \
             model.likelihood.theory.get_Pk_interpolator()
         self.cosmology.cosmo_dic['Pk_delta'] = \
@@ -59,6 +60,7 @@ class cosmoinitTestCase(TestCase):
         self.H0check = 68.0
         self.Dcheck = 1.0
         self.fcheck = 0.135876
+        self.Hcheck = 75.36382368
 
     def tearDown(self):
         self.H0check = None
@@ -73,6 +75,10 @@ class cosmoinitTestCase(TestCase):
         self.cosmology.cosmo_dic['H0'] = self.H0check
         npt.assert_almost_equal(self.cosmology.cosmo_dic['H0'],
                                 self.H0check,
+                                err_msg='Cosmology dictionary assignment '
+                                        'failed')
+        npt.assert_almost_equal(self.cosmology.cosmo_dic['H'](0.2),
+                                self.Hcheck,
                                 err_msg='Cosmology dictionary assignment '
                                         'failed')
 
