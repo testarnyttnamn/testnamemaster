@@ -67,7 +67,7 @@ class Shear:
         #       params_values.get(p, None) for p in
         #       ['phot_b1', 'phot_b2', 'phot_b3', 'phot_b4', 'phot_b5','phot_b6', 'phot_b7', 'phot_b8', 'phot_b9', 'phot_b10']]
 
-        b = np.sqrt(1+(bin_z_min+bin_z_max/2.0)
+        b = np.sqrt(1.0+(bin_z_min+bin_z_max)/2.0)
         # SJ: Yet another option, not used
         #b = np.sqrt(1+z)
         return b
