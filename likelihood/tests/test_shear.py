@@ -30,12 +30,11 @@ class cosmoinitTestCase(TestCase):
             np.linspace(0.0, 2.6, 20), np.linspace(0.0, 2.6, 20), ext=2)
         self.flatnz = interpolate.InterpolatedUnivariateSpline(
             np.linspace(0.0, 2.6, 20), np.ones(20), ext=2)
-        self.sheartest = shear.Shear({})
-        self.sheartest.theory = {'H0': self.H0,
+        self.sheartest = shear.Shear({'H0': self.H0,
                                  'c': self.c,
                                  'omch2': self.omch2,
                                  'ombh2': self.ombh2,
-                                 'r_z_func': self.rfn}
+                                 'r_z_func': self.rfn})
 
         self.integrand_check = -1.0
         self.wbincheck = 9.143694637057992e-09
@@ -53,3 +52,10 @@ class cosmoinitTestCase(TestCase):
         int_comp = self.sheartest.w_kernel_gamma(0.1, self.flatnz, 2.5)
         npt.assert_almost_equal(int_comp, self.wbincheck,
                                 err_msg='WL kernel check failed.')
+
+    def test_rzfunc_exception(self):
+        npt.assert_raises(Exception, shear.Shear,
+                          {'H0': self.H0,
+                           'c': self.c,
+                           'omch2': self.omch2,
+                           'ombh2': self.ombh2})

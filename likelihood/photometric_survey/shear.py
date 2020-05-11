@@ -18,6 +18,9 @@ class Shear:
         ----------
         """
         self.theory = cosmo_dic
+        if self.theory['r_z_func'] is None:
+            raise Exception('No interpolated function for comoving distance '
+                            'exists in cosmo_dic.')
 
     def loglike(self):
         """
