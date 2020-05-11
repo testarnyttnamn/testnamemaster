@@ -31,10 +31,10 @@ class cosmoinitTestCase(TestCase):
         self.flatnz = interpolate.InterpolatedUnivariateSpline(
             np.linspace(0.0, 2.6, 20), np.ones(20), ext=2)
         self.sheartest = shear.Shear({'H0': self.H0,
-                                 'c': self.c,
-                                 'omch2': self.omch2,
-                                 'ombh2': self.ombh2,
-                                 'r_z_func': self.rfn})
+                                      'c': self.c,
+                                      'omch2': self.omch2,
+                                      'ombh2': self.ombh2,
+                                      'r_z_func': self.rfn})
 
         self.integrand_check = -1.0
         self.wbincheck = 9.143694637057992e-09
