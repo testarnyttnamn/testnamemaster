@@ -38,7 +38,7 @@ class cosmoinitTestCase(TestCase):
                                  'r_z_func': self.rfn}
 
         self.integrand_check = -1.0
-        self.wbincheck = -7.281359503039547e-09
+        self.wbincheck = 9.143694637057992e-09
 
     def tearDown(self):
         self.integrand_check = None
@@ -50,6 +50,6 @@ class cosmoinitTestCase(TestCase):
                                 err_msg='WL kernel integrand check failed.')
 
     def test_w_bin(self):
-        int_comp = self.sheartest.w_kernel_gamma(0.1, self.flatnz)
+        int_comp = self.sheartest.w_kernel_gamma(0.1, self.flatnz, 2.5)
         npt.assert_almost_equal(int_comp, self.wbincheck,
                                 err_msg='WL kernel check failed.')

@@ -99,9 +99,14 @@ class cosmoinitTestCase(TestCase):
                          err_msg='f_z_k not calculated ')
 
     def test_cosmo_comov_dist_interp(self):
-        self.cosmology.interp_comoving_dist(self.z_win)
+        self.cosmology.cosmo_dic['z_win'] = self.z_win
+        self.cosmology.interp_comoving_dist()
         npt.assert_almost_equal(self.cosmology.cosmo_dic['comov_dist'][1],
                                 self.cosmology.cosmo_dic['r_z_func']
                                 (self.z_win[1]),
                                 err_msg='Interpolation of comoving distance '
                                         'failed.')
+
+    def test_zwin_exception(self):
+        self.cosmology.cosmo_dic['z_win'] = None
+        npt.assert_raises(Exception, self.cosmology.interp_comoving_dist)
