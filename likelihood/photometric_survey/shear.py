@@ -32,9 +32,45 @@ class Shear:
 
         self.theory = cosmo_dic
 
-    def bias(self, k, z):
-        # (GCH): This should be implemented by Shahab
-        b = 1
+    # SJ: k-indep bias for now
+    # def bias(self, k, z):
+    def bias(self, bin_z_min, bin_z_max):
+        """
+        Returns the photometric galaxy bias.
+        For now use Eqn 133 in arXiv:1910.09273
+
+        Parameters
+        ----------
+        # SJ: k-indep bias for now
+        # k: float
+        #    Scale at which to evaluate the bias
+        # z: float
+        #    Redshift at which to evaluate distribution.
+        bin_z_max: float
+                   Upper limit of bin
+        bin_z_min: float
+                   Lower limit of bin
+
+        Returns
+        -------
+        b: float
+           galaxy bias
+
+        Notes
+        -----
+        .. math::
+            b(z) &= \sqrt{1+\bar{z}}\\
+        """
+
+        # SJ: We could eventually have a bias parameter for each
+        # SJ: tomographic bin (also see yaml file)
+        # phot_bias = [params_values.get(p, None) for p in \
+        #     ['phot_b1', 'phot_b2', 'phot_b3', 'phot_b4', 'phot_b5', \
+        #     'phot_b6', 'phot_b7', 'phot_b8', 'phot_b9', 'phot_b10']]
+
+        b = np.sqrt(1.0 + (bin_z_min + bin_z_max) / 2.0)
+        # SJ: Yet another option, not used
+        # b = np.sqrt(1 + z)
         return b
 
     def GC_window(self, bin_i, bin_j, bin_z_min, bin_z_max, k, z):
@@ -70,7 +106,10 @@ class Shear:
             print('Error in initializing the class Galdist')
         # (GCH): call n_z_normalized from Galdist
         n_z_normalized = galdist.p_up(bin_z_min, bin_z_max)
-        W_i_G = self.bias(k, z) * n_z_normalized(z) * self.theory['H'](z)
+        # SJ: k-indep bias, let us follow the IST:F approach for now
+        # W_i_G = self.bias(k, z) * n_z_normalized(z) * self.theory['H'](z)
+        W_i_G = self.bias(bin_z_min, bin_z_max) * n_z_normalized(z) * \
+            self.theory['H'](z)
         return W_i_G
 
     def loglike(self):
