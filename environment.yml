@@ -11,7 +11,7 @@ dependencies:
   - jupyter>=1.0
   - camb>=1.0
   - pip:
-    - cobaya=2.0.3
+    - cobaya==2.0.3
     - pytest
     - pytest-cov
     - pytest-pep8
