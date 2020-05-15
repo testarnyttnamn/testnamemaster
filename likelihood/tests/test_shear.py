@@ -77,6 +77,6 @@ class cosmoinitTestCase(TestCase):
                                 err_msg='Error in GW_window')
 
     def test_phot_galbias(self):
-        npt.assert_almost_equal(self.shear.phot_galbias(0.1,0.3),
+        npt.assert_almost_equal(self.shear.phot_galbias(0.1, 0.3),
                                 self.phot_galbias_check,
                                 err_msg='Error in photometric galaxy bias')
