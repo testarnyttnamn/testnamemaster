@@ -63,9 +63,11 @@ class cosmoinitTestCase(TestCase):
         # (GCH): import Shear
         self.shear = shear.Shear(self.cosmology.cosmo_dic)
         self.W_i_Gcheck = 0.00375464
+        self.phot_galbias_check = 1.09544512
 
     def tearDown(self):
         self.W_i_Gcheck = None
+        self.galbias_check = None
 
     def test_GC_window(self):
         npt.assert_almost_equal(self.shear.GC_window([0.001, 0.418],
@@ -73,3 +75,8 @@ class cosmoinitTestCase(TestCase):
                                                      0.0, 0.3, 0.2, 0.001),
                                 self.W_i_Gcheck,
                                 err_msg='Error in GW_window')
+
+    def test_phot_galbias(self):
+        npt.assert_almost_equal(self.shear.phot_galbias(0.1,0.3),
+                                self.phot_galbias_check,
+                                err_msg='Error in photometric galaxy bias')

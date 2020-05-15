@@ -34,7 +34,7 @@ class Shear:
 
     # SJ: k-indep bias for now
     # def bias(self, k, z):
-    def bias(self, bin_z_min, bin_z_max):
+    def phot_galbias(self, bin_z_min, bin_z_max):
         """
         Returns the photometric galaxy bias.
         For now use Eqn 133 in arXiv:1910.09273
@@ -64,7 +64,7 @@ class Shear:
 
         # SJ: We could eventually have a bias parameter for each
         # SJ: tomographic bin (also see yaml file)
-        # phot_bias = [params_values.get(p, None) for p in \
+        # phot_galbias = [params_values.get(p, None) for p in \
         #     ['phot_b1', 'phot_b2', 'phot_b3', 'phot_b4', 'phot_b5', \
         #     'phot_b6', 'phot_b7', 'phot_b8', 'phot_b9', 'phot_b10']]
 
@@ -107,8 +107,9 @@ class Shear:
         # (GCH): call n_z_normalized from Galdist
         n_z_normalized = galdist.p_up(bin_z_min, bin_z_max)
         # SJ: k-indep bias, let us follow the IST:F approach for now
-        # W_i_G = self.bias(k, z) * n_z_normalized(z) * self.theory['H'](z)
-        W_i_G = self.bias(bin_z_min, bin_z_max) * n_z_normalized(z) * \
+        # W_i_G = self.phot_galbias(k, z) * n_z_normalized(z) * \
+        #     self.theory['H'](z)
+        W_i_G = self.phot_galbias(bin_z_min, bin_z_max) * n_z_normalized(z) * \
             self.theory['H'](z)
         return W_i_G
 
