@@ -5,6 +5,7 @@ Class to store cosmological parameters and functions.
 """
 
 import numpy as np
+from scipy import interpolate
 
 
 class CosmologyError(Exception):
@@ -25,8 +26,41 @@ class Cosmology:
         ----------
         None
 
+        Cosmology dictionary parameters
+        -------------------------------
+        H0: float
+            Present-day Hubble constant (km s^{-1} Mpc^{-1})
+        omch2: float
+            Present-day Omega_CDM * (H0/100)**2
+        ombh2: float
+            Present-day Omega_baryon * (H0/100)**2
+        mnu: float
+            Sum of massive neutrino species masses (eV)
+        comov_dist: array-like
+            Value of comoving distances at redshifts z_win
+        H: array-like
+            Hubble function evaluated at redshifts z_win
+        Pk_interpolator: function
+            Interpolator function for power spectrum from Boltzmann code
+        Pk_delta: function
+            Interpolator function for delta from Boltzmann code
+        fsigma8: float
+            fsigma8 function evaluated at z=0.5
+        b_gal: float
+            Galaxy bias
+        sigma_8: float
+            Present-day value of sigma8
+        c: float
+            Speed-of-light in units of km s^{-1}
+        r_z_func: function
+            Interpolated function for comoving distance
+        z_win: array-like
+            Array of redshifts ar which H and comov_dist are evaluated at
+
         """
         # (GCH): initialize cosmo dictionary
+        # (ACD): Added speed of light to dictionary.!!!Important:it's in units
+        # of km/s to be dimensionally consistent with H0.!!!!
         self.cosmo_dic = {'H0': 67.5,
                           'omch2': 0.122,
                           'ombh2': 0.022,
@@ -39,7 +73,9 @@ class Cosmology:
                           'zk': None,
                           'b_gal': None,
                           'sigma_8': None,
-                          }
+                          'c': 3.0e5,
+                          'r_z_func': None,
+                          'z_win': None}
 
     def growth_factor(self, zs, ks):
         """
@@ -125,3 +161,23 @@ class Cosmology:
         # an updated dictionary with D_z and f
         self.cosmo_dic['D_z_k'] = self.growth_factor(zs, ks)
         self.cosmo_dic['f_z_k'] = self.growth_rate(zs, ks)
+
+    def interp_comoving_dist(self):
+        """
+        Adds an interpolator for comoving distance to the dictionary so that
+        it can be evaluated at redshifts not explictly supplied to cobaya.
+
+        Parameters
+        ----------
+        zs: array
+            list of redshift comoving distance is evaluated at.
+        Returns
+        -------
+        None
+
+        """
+        if self.cosmo_dic['z_win'] is None:
+            raise Exception('Boltzmann code redshift binning has not been '
+                            'supplied to cosmo_dic.')
+        self.cosmo_dic['r_z_func'] = interpolate.InterpolatedUnivariateSpline(
+            x=self.cosmo_dic['z_win'], y=self.cosmo_dic['comov_dist'], ext=2)
