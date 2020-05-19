@@ -79,7 +79,7 @@ class cosmoinitTestCase(TestCase):
 
     def tearDown(self):
         self.W_i_Gcheck = None
-        self.galbias_check = None
+        self.phot_galbias_check = None
         self.integrand_check = None
         self.wbincheck = None
 
