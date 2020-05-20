@@ -87,6 +87,10 @@ class Shear:
            Redshift bounds of bin i (lower, higher)
         bin_j: list, float
            Redshift bounds of bin j (lower, higher)
+        bin_z_max: float
+                   Upper limit of bin
+        bin_z_min: float
+                   Lower limit of bin
         k: float
            Scale at which to evaluate the bias
         z: float
@@ -109,22 +113,13 @@ class Shear:
         except ShearError:
             print('Error in initializing the class Galdist')
         # (GCH): call n_z_normalized from Galdist
-        n_z_normalized = galdist.p_up(bin_z_min, bin_z_max)
+        n_z_normalized = galdist.n_i
         # SJ: k-indep bias, let us follow the IST:F approach for now
         # W_i_G = self.phot_galbias(k, z) * n_z_normalized(z) * \
         #     self.theory['H'](z)
         W_i_G = self.phot_galbias(bin_z_min, bin_z_max) * n_z_normalized(z) * \
             self.theory['H'](z)
         return W_i_G
-
-    def loglike(self):
-        """
-        Returns loglike for Shear observable
-        """
-
-        # likelihood value is currently only a place holder!
-        loglike = 0.0
-        return loglike
 
     def w_gamma_integrand(self, zprime, z, nz):
         """
@@ -184,7 +179,16 @@ class Shear:
                (self.theory['ombh2'] / (H0 / 100.0)**2.0))
         # (ACD): Note that impact of MG is currently neglected (\Sigma=1).
         W_val = (1.5 * (H0 / c) * O_m * (1.0 + z) * (
-                self.theory['r_z_func'](z) /
+            self.theory['r_z_func'](z) /
                 (c / H0)) * integrate.quad(self.w_gamma_integrand, a=z,
                                            b=z_max, args=(z, tomo_bin))[0])
         return W_val
+
+    def loglike(self):
+        """
+        Returns loglike for Shear observable
+        """
+
+        # likelihood value is currently only a place holder!
+        loglike = 0.0
+        return loglike
