@@ -18,6 +18,7 @@ from ..cosmo.cosmology import Cosmology
 from likelihood.cobaya_interface import loglike
 from ..photometric_survey import shear
 from scipy.interpolate import UnivariateSpline
+from astropy import constants as const
 
 
 class cosmoinitTestCase(TestCase):
@@ -69,7 +70,7 @@ class cosmoinitTestCase(TestCase):
         self.integrand_check = -1.0
         self.wbincheck = 9.143694637057992e-09
         self.H0 = 67.0
-        self.c = 3.0e5
+        self.c = const.c.to('km/s').value
         self.omch2 = 0.12
         self.ombh2 = 0.022
         # (GCH): import Shear
