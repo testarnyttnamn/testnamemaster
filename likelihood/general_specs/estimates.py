@@ -196,6 +196,8 @@ class Galdist:
         Computes the observed galaxy distribution, by carrying out convolution
         of true n(z) with photometric uncertainty PDF.
 
+        Output is the normalized n(z) within the redshift bin.
+
         Eq. 112 of https://arxiv.org/abs/1910.09273
 
         Parameters
