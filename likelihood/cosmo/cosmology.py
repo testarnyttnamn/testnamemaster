@@ -6,6 +6,7 @@ Class to store cosmological parameters and functions.
 
 import numpy as np
 from scipy import interpolate
+from astropy import constants as const
 
 
 class CosmologyError(Exception):
@@ -73,7 +74,7 @@ class Cosmology:
                           'zk': None,
                           'b_gal': None,
                           'sigma_8': None,
-                          'c': 3.0e5,
+                          'c': const.c.to('km/s').value,
                           'r_z_func': None,
                           'z_win': None}
 

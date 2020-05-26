@@ -15,7 +15,7 @@ import numpy.testing as npt
 from scipy import integrate
 from scipy import interpolate
 from ..cosmo.cosmology import Cosmology
-from likelihood.cobaya_interface import loglike
+from likelihood.cobaya_interface import EuclidLikelihood
 from ..photometric_survey import shear
 from scipy.interpolate import UnivariateSpline
 from astropy import constants as const
@@ -31,37 +31,43 @@ class cosmoinitTestCase(TestCase):
         self.z_win = np.linspace(z_min, z_max, z_samp)
         info = {
             'params': {
-                'ombh2': 0.022, 'omch2': 0.12, 'H0': 68.0, 'tau': 0.07,
-                'mnu': 0.06, 'nnu': 3.046, 'num_massive_neutrinos': 1,
-                'ns': 0.9674, 'like_selection': 12, 'As': 2.1e-9},
-            'theory': {'camb': {'stop_at_error': True}},
-            'likelihood': {'euclid': loglike},
+                'ombh2': 0.022,
+                'omch2': 0.12,
+                'H0': 68.0,
+                'tau': 0.07,
+                'mnu': 0.06,
+                'nnu': 3.046,
+                'ns': 0.9674,
+                'As': 2.1e-9,
+                'like_selection': 12},
+            'theory': {
+                'camb': {
+                    'stop_at_error': True,
+                    'extra_args': {
+                        'num_massive_neutrinos': 1}}},
+            'likelihood': {
+                'euclid': EuclidLikelihood},
         }
         model = get_model(info)
         model.logposterior({})
         self.cosmology = Cosmology()
-        self.cosmology.cosmo_dic['H0'] = \
-            model.parameterization.constant_params()['H0']
-        self.cosmology.cosmo_dic['omch2'] =  \
-            model.parameterization.constant_params()['omch2']
-        self.cosmology.cosmo_dic['ombh2'] = \
-            model.parameterization.constant_params()['ombh2']
-        self.cosmology.cosmo_dic['mnu'] = \
-            model.parameterization.constant_params()['mnu']
+        self.cosmology.cosmo_dic['H0'] = model.provider.get_param('H0')
+        self.cosmology.cosmo_dic['omch2'] = model.provider.get_param('omch2')
+        self.cosmology.cosmo_dic['ombh2'] = model.provider.get_param('ombh2')
+        self.cosmology.cosmo_dic['mnu'] = model.provider.get_param('mnu')
         self.cosmology.cosmo_dic['comov_dist'] = \
-            model.likelihood.theory.get_comoving_radial_distance(
+            model.provider.get_comoving_radial_distance(
             self.z_win)
         self.cosmology.cosmo_dic['H'] = UnivariateSpline(
-            self.z_win, model.likelihood.theory.get_H(self.z_win))
+            self.z_win, model.provider.get_Hubble(self.z_win))
         self.cosmology.cosmo_dic['Pk_interpolator'] = \
-            model.likelihood.theory.get_Pk_interpolator()
+            model.provider.get_Pk_interpolator(nonlinear=False)
         self.cosmology.cosmo_dic['Pk_delta'] = \
-            (self.cosmology.cosmo_dic['Pk_interpolator']
-                ['delta_tot_delta_tot'])
+            model.provider.get_Pk_interpolator(
+            ("delta_tot", "delta_tot"), nonlinear=False)
         self.cosmology.cosmo_dic['fsigma8'] = \
-            model.likelihood.theory.get_fsigma8(self.z_win)
+            model.provider.get_fsigma8(self.z_win)
         # (GCH): required by Anurag
-        self.cosmology.cosmo_dic['c'] = self.c = 3.0e5
         self.rfn = interpolate.InterpolatedUnivariateSpline(
             np.linspace(0.0, 2.6, 20), np.linspace(0.0, 2.6, 20), ext=2)
         self.flatnz = interpolate.InterpolatedUnivariateSpline(
@@ -107,7 +113,7 @@ class cosmoinitTestCase(TestCase):
                                 err_msg='WL kernel check failed.')
 
     def test_rzfunc_exception(self):
-        npt.assert_raises(Exception, shear.Shear,
+        npt.assert_raises(Exception, self.shear,
                           {'H0': self.H0,
                            'c': self.c,
                            'omch2': self.omch2,

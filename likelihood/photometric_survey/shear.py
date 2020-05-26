@@ -30,7 +30,6 @@ class Shear:
         cosmo_dic: dictionary
            cosmological dictionary from cosmo
         """
-
         self.theory = cosmo_dic
         if self.theory['r_z_func'] is None:
             raise Exception('No interpolated function for comoving distance '
