@@ -42,7 +42,7 @@ class Galdist:
         if n_type == 'istf':
             istf_bin_list = [0.001, 0.418, 0.560, 0.678, 0.789, 0.900,
                              1.019, 1.155, 1.324, 1.576, 2.50]
-            self.n_i = self.p_up(istf_bin_list[bin_i-1],
+            self.n_i = self.p_up(istf_bin_list[bin_i - 1],
                                  istf_bin_list[bin_i])
         elif n_type == 'custom':
             if n_file is None:
