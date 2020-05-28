@@ -31,7 +31,7 @@ class Shear:
            cosmological dictionary from cosmo
         """
         self.theory = cosmo_dic
-        if self.theory['r_z_func'] is None:
+        if self.theory['comov_dist'] is None:
             raise Exception('No interpolated function for comoving distance '
                             'exists in cosmo_dic.')
 
@@ -143,8 +143,8 @@ class Shear:
         Integrand value
         """
 
-        wint = nz(zprime) * (1.0 - (self.theory['r_z_func'](z) /
-                                    self.theory['r_z_func'](zprime)))
+        wint = nz(zprime) * (1.0 - (self.theory['comov_dist'](z) /
+                                    self.theory['comov_dist'](zprime)))
         return wint
 
     def w_kernel_gamma(self, z, tomo_bin, z_max):
@@ -178,7 +178,7 @@ class Shear:
                (self.theory['ombh2'] / (H0 / 100.0)**2.0))
         # (ACD): Note that impact of MG is currently neglected (\Sigma=1).
         W_val = (1.5 * (H0 / c) * O_m * (1.0 + z) * (
-            self.theory['r_z_func'](z) /
+            self.theory['comov_dist'](z) /
                 (c / H0)) * integrate.quad(self.w_gamma_integrand, a=z,
                                            b=z_max, args=(z, tomo_bin))[0])
         return W_val

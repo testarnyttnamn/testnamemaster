@@ -75,7 +75,6 @@ class Cosmology:
                           'b_gal': None,
                           'sigma_8': None,
                           'c': const.c.to('km/s').value,
-                          'r_z_func': None,
                           'z_win': None}
 
     def growth_factor(self, zs, ks):

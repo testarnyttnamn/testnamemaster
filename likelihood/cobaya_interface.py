@@ -22,12 +22,30 @@ class CobayaInterfaceError(Exception):
 
 
 class EuclidLikelihood(Likelihood):
-    aliases = ["myOld"]
+    r"""
+    Class to define Euclid Likelihood
+
+    Inherits from the Likelihood class
+    of Cobaya
+    """
+
+    # (GCH): alias for cov-mat
+    aliases = ["myEuclid"]
     # Speed in evaluations/second (after theory inputs calculated).
     speed = 500
+    # (GCH): which parameters are required by likelihood?
+    # Define them here:
     params = {"like_selection": None}
 
     def initialize(self):
+        r""" get_requirements
+
+        New 'theory needs'. Asks for the theory
+        requirements to the theory code via
+        Cobaya.
+
+        """
+
         # SJ: For now, example sampling in wavenumber (k)
         self.k_min = 0.002
         self.k_max = 0.2
@@ -49,7 +67,27 @@ class EuclidLikelihood(Likelihood):
         # SJ: temporary (needs to be obtained from Cobaya)
         self.sigma_8 = 1.0
 
+        # (GCH): initialize Cosmology class
+        self.cosmo = Cosmology()
+
     def get_requirements(self):
+        r""" get_requirements
+
+        New 'theory needs'. Asks for the theory
+        requirements to the theory code via
+        Cobaya.
+
+
+        Returns
+        ----------
+        loglikes: float
+
+
+        return dictionary specifying quantities i
+        calculated by a theory code are needed
+
+        """
+
         return {"Pk_interpolator": {"z": self.z_win,
                                     "k_max": self.k_max,
                                     "nonlinear": False,
@@ -59,75 +97,67 @@ class EuclidLikelihood(Likelihood):
                 "Hubble": {"z": self.z_win, "units": "km/s/Mpc"},
                 "fsigma8": {"z": self.z_win, "units": None}}
 
-    def logp(self, **params_values):
-        r""" logp
+    def passing_requirements(self):
+        r""" passing_requirements
 
-        External likelihood module called by COBAYA
+        Gets cosmological quantities from the theory code
+        from COBAYA and passes them to an instance of the
+        Cosmology class.
+
+        Cosmological quantities are saved in the cosmo_dic
+        attribute of the Cosmology class.
+
+        """
+
+        try:
+            self.cosmo.cosmo_dic['H0'] = self.provider.get_param("H0")
+            self.cosmo.cosmo_dic['omch2'] = self.provider.get_param('omch2')
+            self.cosmo.cosmo_dic['ombh2'] = self.provider.get_param('ombh2')
+            self.cosmo.cosmo_dic['mnu'] = self.provider.get_param('mnu')
+            self.cosmo.cosmo_dic['comov_dist'] = UnivariateSpline(
+                self.z_win,
+                self.provider.get_comoving_radial_distance(self.z_win))
+            self.cosmo.cosmo_dic['H'] = UnivariateSpline(
+                self.z_win, self.provider.get_Hubble(self.z_win))
+            self.cosmo.cosmo_dic['Pk_interpolator'] = \
+                self.provider.get_Pk_interpolator(nonlinear=False)
+            self.cosmo.cosmo_dic['zk'] = self.zk
+            self.cosmo.cosmo_dic['b_gal'] = self.b_gal
+            self.cosmo.cosmo_dic['sigma_8'] = self.sigma_8
+            self.cosmo.cosmo_dic['Pk_delta'] = \
+                self.provider.get_Pk_interpolator(
+                ("delta_tot", "delta_tot"), nonlinear=False)
+            self.cosmo.cosmo_dic['fsigma8'] = self.provider.get_fsigma8(
+                self.cosmo.cosmo_dic['zk'])
+            self.cosmo.cosmo_dic['z_win'] = self.z_win
+        except CobayaInterfaceError:
+            print('Cobaya theory requirements \
+                  could not be pass to cosmo module')
+
+    def log_likelihood(self, dictionary, **data_params):
+        r""" log_likelihood
+
+        Calculates the log-likelihood given the selection
 
         Parameters
         ----------
-        like_selection: int
-              Parameter to specify which likelihood to  use:
-              12 - use WL and GC spec (default value)
-              1 - use WL only
-              2 - use GC spec only
-              this will updated in the future by strings
+        dictionary: dictionary
+            cosmology dictionary from Cosmology class
+
         Returns
         ----------
         loglikes: float
             must return -0.5*chi2
         """
-
-        cosmo = Cosmology()
-        try:
-            cosmo.cosmo_dic['H0'] = self.provider.get_param("H0")
-            cosmo.cosmo_dic['omch2'] = self.provider.get_param('omch2')
-            cosmo.cosmo_dic['ombh2'] = self.provider.get_param('ombh2')
-            cosmo.cosmo_dic['mnu'] = self.provider.get_param('mnu')
-            cosmo.cosmo_dic['comov_dist'] = \
-                self.provider.get_comoving_radial_distance(self.z_win)
-            cosmo.cosmo_dic['H'] = UnivariateSpline(
-                self.z_win, self.provider.get_Hubble(self.z_win))
-            cosmo.cosmo_dic['Pk_interpolator'] = \
-                self.provider.get_Pk_interpolator(nonlinear=False)
-            cosmo.cosmo_dic['zk'] = self.zk
-            cosmo.cosmo_dic['b_gal'] = self.b_gal
-            cosmo.cosmo_dic['sigma_8'] = self.sigma_8
-            cosmo.cosmo_dic['Pk_delta'] = \
-                self.provider.get_Pk_interpolator(
-                ("delta_tot", "delta_tot"), nonlinear=False)
-            cosmo.cosmo_dic['fsigma8'] = self.provider.get_fsigma8(
-                cosmo.cosmo_dic['zk'])
-            cosmo.cosmo_dic['z_win'] = self.z_win
-        except CobayaInterfaceError:
-            print('Cobaya theory requirements \
-                  could not be pass to cosmo module')
-
-        return self.log_likelihood(cosmo.cosmo_dic, **params_values)
-
-    def log_likelihood(self, dictionary, **data_params):
-
-        # (GCH): loglike computation
         loglike = 0.0
-        # (GCH): issue with cobaya to pass strings to external likelihood
-        # as parameter
         like_selection = data_params['like_selection']
         if like_selection == 1:
-            like_selection = "shear"
-        elif like_selection == 2:
-            like_selection = "spec"
-        elif like_selection == 12:
-            like_selection = "both"
-
-        # (GCH) Select with class to work with based on like_selection
-        # (GCH) Within each if-statement, compute loglike
-        if like_selection.lower() == "shear":
             shear_ins = Shear(dictionary)
             loglike = shear_ins.loglike()
-        elif like_selection.lower() == "spec":
+        elif like_selection == 2:
             spec_ins = Spec(dictionary)
             loglike = spec_ins.loglike()
-        elif like_selection.lower() == 'both':
+        elif like_selection == 12:
             shear_ins = Shear(dictionary)
             spec_ins = Spec(dictionary)
             loglike_shear = shear_ins.loglike()
@@ -136,6 +166,25 @@ class EuclidLikelihood(Likelihood):
         else:
             raise CobayaInterfaceError(
                 r"Choose like selection 'shear' or 'spec' or 'both'")
+        # (GCH): For the moment, it returns -15 (-0.5 * chi2)
+        loglike = -0.5 * 30
+        return loglike
 
-        # (GCH) loglike=-0.5*chi2
+    def logp(self, **params_values):
+        r""" logp
+
+        External likelihood module called by COBAYA
+
+        Parameters
+        ----------
+        **params_values: tuple
+              List of (sampled) parameters obtained from
+              the theory code or asked by the likelihood
+        Returns
+        ----------
+        loglikes: float
+            must return -0.5*chi2
+        """
+        self.passing_requirements()
+        loglike = self.log_likelihood(self.cosmo.cosmo_dic, **params_values)
         return loglike

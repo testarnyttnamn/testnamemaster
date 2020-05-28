@@ -50,14 +50,15 @@ class cosmoinitTestCase(TestCase):
         }
         model = get_model(info)
         model.logposterior({})
+
         self.cosmology = Cosmology()
         self.cosmology.cosmo_dic['H0'] = model.provider.get_param('H0')
         self.cosmology.cosmo_dic['omch2'] = model.provider.get_param('omch2')
         self.cosmology.cosmo_dic['ombh2'] = model.provider.get_param('ombh2')
         self.cosmology.cosmo_dic['mnu'] = model.provider.get_param('mnu')
-        self.cosmology.cosmo_dic['comov_dist'] = \
-            model.provider.get_comoving_radial_distance(
-            self.z_win)
+        self.cosmology.cosmo_dic['comov_dist'] = UnivariateSpline(
+            self.z_win,
+            model.provider.get_comoving_radial_distance(self.z_win))
         self.cosmology.cosmo_dic['H'] = UnivariateSpline(
             self.z_win, model.provider.get_Hubble(self.z_win))
         self.cosmology.cosmo_dic['Pk_interpolator'] = \
@@ -67,14 +68,10 @@ class cosmoinitTestCase(TestCase):
             ("delta_tot", "delta_tot"), nonlinear=False)
         self.cosmology.cosmo_dic['fsigma8'] = \
             model.provider.get_fsigma8(self.z_win)
-        # (GCH): required by Anurag
-        self.rfn = interpolate.InterpolatedUnivariateSpline(
-            np.linspace(0.0, 2.6, 20), np.linspace(0.0, 2.6, 20), ext=2)
         self.flatnz = interpolate.InterpolatedUnivariateSpline(
             np.linspace(0.0, 2.6, 20), np.ones(20), ext=2)
-        self.cosmology.cosmo_dic['r_z_func'] = self.rfn
-        self.integrand_check = -1.0
-        self.wbincheck = 9.143694637057992e-09
+        self.integrand_check = -0.9460376506043413
+        self.wbincheck = 2.269427130923892e-05
         self.H0 = 67.0
         self.c = const.c.to('km/s').value
         self.omch2 = 0.12
