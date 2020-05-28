@@ -35,5 +35,6 @@ info = {
     'debug': False,
     'force': True
     }
+
 from cobaya.run import run
 info_updated, samples = run(info)
