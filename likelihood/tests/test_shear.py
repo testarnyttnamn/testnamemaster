@@ -85,25 +85,27 @@ class cosmoinitTestCase(TestCase):
         self.wbincheck = None
 
     def test_GC_window(self):
+        print(self.shear.GC_window(0.2, 0.001, 1))
         npt.assert_almost_equal(self.shear.GC_window(0.2, 0.001, 1),
                                 self.W_i_Gcheck,
                                 err_msg='Error in GW_window')
-    
+
     def test_phot_galbias(self):
         npt.assert_almost_equal(self.shear.phot_galbias(0.1, 0.3),
                                 self.phot_galbias_check,
                                 err_msg='Error in photometric galaxy bias')
-    
+
     def test_w_integrand(self):
         int_comp = self.shear.WL_window_integrand(0.1, 0.2, self.flatnz)
         npt.assert_almost_equal(int_comp, self.integrand_check,
                                 err_msg='WL kernel integrand check failed.')
-    
+
     def test_WL_window(self):
         int_comp = self.shear.WL_window(0.1, 1)
+        print(self.shear.WL_window(0.1, 1))
         npt.assert_almost_equal(int_comp, self.wbincheck,
                                 err_msg='WL kernel check failed.')
-    
+
     def test_rzfunc_exception(self):
         npt.assert_raises(Exception, shear.Shear,
                           {'H0': self.H0,
