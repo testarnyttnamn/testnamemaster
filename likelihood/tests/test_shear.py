@@ -75,7 +75,7 @@ class cosmoinitTestCase(TestCase):
         self.ombh2 = 0.022
         # (GCH): import Shear
         self.shear = shear.Shear(self.cosmology.cosmo_dic)
-        self.W_i_Gcheck = 0.001700557
+        self.W_i_Gcheck = 0.002724124626761272
         self.phot_galbias_check = 1.09544512
 
     def tearDown(self):
@@ -85,10 +85,9 @@ class cosmoinitTestCase(TestCase):
         self.wbincheck = None
 
     def test_GC_window(self):
-        print(self.shear.GC_window(0.2, 0.001, 1))
         npt.assert_almost_equal(self.shear.GC_window(0.2, 0.001, 1),
                                 self.W_i_Gcheck,
-                                err_msg='Error in GW_window')
+                                verbose)
 
     def test_phot_galbias(self):
         npt.assert_almost_equal(self.shear.phot_galbias(0.1, 0.3),
@@ -102,9 +101,8 @@ class cosmoinitTestCase(TestCase):
 
     def test_WL_window(self):
         int_comp = self.shear.WL_window(0.1, 1)
-        print(self.shear.WL_window(0.1, 1))
         npt.assert_almost_equal(int_comp, self.wbincheck,
-                                err_msg='WL kernel check failed.')
+                                verbose)
 
     def test_rzfunc_exception(self):
         npt.assert_raises(Exception, shear.Shear,
