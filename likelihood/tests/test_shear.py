@@ -85,9 +85,7 @@ class cosmoinitTestCase(TestCase):
         self.wbincheck = None
 
     # def test_GC_window(self):
-    #     npt.assert_almost_equal(self.shear.GC_window([0.001, 0.418],
-    #                                                  [0.001, 0.418],
-    #                                                  0.0, 0.3, 0.2, 0.001),
+    #     npt.assert_almost_equal(self.shear.GC_window(0.2, 0.001, 1),
     #                             self.W_i_Gcheck,
     #                             err_msg='Error in GW_window')
     #
@@ -97,12 +95,12 @@ class cosmoinitTestCase(TestCase):
     #                             err_msg='Error in photometric galaxy bias')
     #
     # def test_w_integrand(self):
-    #     int_comp = self.shear.w_gamma_integrand(0.1, 0.2, self.flatnz)
+    #     int_comp = self.shear.WL_window_integrand(0.1, 0.2, self.flatnz)
     #     npt.assert_almost_equal(int_comp, self.integrand_check,
     #                             err_msg='WL kernel integrand check failed.')
     #
-    # def test_w_bin(self):
-    #     int_comp = self.shear.w_kernel_gamma(0.1, self.flatnz, 2.5)
+    # def test_WL_window(self):
+    #     int_comp = self.shear.WL_window(0.1, 1)
     #     npt.assert_almost_equal(int_comp, self.wbincheck,
     #                             err_msg='WL kernel check failed.')
     #
