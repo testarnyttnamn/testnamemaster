@@ -52,7 +52,7 @@ jobs:
 
     - name: Create dummy hmcode module patch
       run: |
-        echo "
+        cat << EOF > dummy_hmcode.py
 import sys
 import types
 
@@ -63,12 +63,11 @@ class DummyHMCode(types.ModuleType):
         return dummy
 
 sys.modules['hmcode'] = DummyHMCode('hmcode')
-" > dummy_hmcode.py
+EOF
 
     - name: Run tests with coverage and dummy hmcode patch
       run: |
-        python -c "import dummy_hmcode"
-        pytest --cov=cloe --cov-report=xml
+        python -c "import dummy_hmcode" -m pytest --cov=cloe --cov-report=xml
         ls -l coverage.xml
         head -20 coverage.xml
 
