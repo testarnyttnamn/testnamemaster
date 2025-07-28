@@ -65,10 +65,11 @@ class DummyHMCode(types.ModuleType):
 sys.modules['hmcode'] = DummyHMCode('hmcode')
 " > dummy_hmcode.py
 
-    - name: Run tests with coverage using dummy hmcode patch
+    - name: Run tests with dummy hmcode patch and coverage
       run: |
-        conda run -n cloe python -c "import dummy_hmcode" 
-        conda run -n cloe pytest --cov=cloe --cov-report=xml
+        echo 'import dummy_hmcode' > test_wrapper.py
+        echo 'import pytest; raise SystemExit(pytest.main(["--cov=cloe", "--cov-report=xml"]))' >> test_wrapper.py
+        conda run -n cloe python test_wrapper.py
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
