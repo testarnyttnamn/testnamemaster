@@ -14,18 +14,19 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential gfortran
+
     - name: Set up Miniconda
       uses: conda-incubator/setup-miniconda@v2
       with:
         auto-update-conda: true
         python-version: 3.9  # match your env's python version
         activate-environment: cloe
+        environment-file: environment.yml
         use-mamba: true
-
-    - name: Install system dependencies for pyhmcode
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y make gfortran
 
     - name: Debug conda env update
       run: |
