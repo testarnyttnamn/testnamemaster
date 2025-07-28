@@ -1,10 +1,10 @@
-name: Python Tests
+name: Python CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [ main ]
   pull_request:
-    branches: [main, master]
+    branches: [ main ]
 
 jobs:
   test:
@@ -14,21 +14,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Miniconda
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential gfortran make
+
+      - name: Set up conda
         uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: 3.9
+          auto-update-conda: true
           environment-file: environment.yml
           activate-environment: cloe
-          auto-activate-base: false
+          python-version: 3.9
+          use-mamba: true
 
-      - name: Install pip packages (if any left)
+      - name: Run tests with coverage
         run: |
-          # pip installs from your environment.yml's pip section should be handled by conda
-          # But if you want to force install (optional), uncomment:
-          # pip install -r requirements.txt
-          echo "Pip packages handled by conda environment"
-
-      - name: Run pytest with coverage
-        run: |
-          pytest --cov=cloe --cov-report=term --cov-report=xml --junitxml=pytest.xml
+          python -m pytest --cov=cloe --cov-report=term --cov-report=xml --junitxml=pytest.xml
