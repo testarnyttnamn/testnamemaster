@@ -66,15 +66,21 @@ jobs:
         echo "" >> dummy_hmcode.py
         echo "sys.modules['hmcode'] = DummyHMCode('hmcode')" >> dummy_hmcode.py
 
-    - name: Run tests with coverage and dummy hmcode patch
+    - name: Run tests without coverage (debug)
       run: |
-        python -c "import dummy_hmcode" -m pytest --cov=cloe --cov-report=xml
-        ls -l coverage.xml
-        head -20 coverage.xml
+        pytest -v -s
 
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        files: coverage.xml
-        flags: unittests
-        fail_ci_if_error: true
+# You can uncomment the coverage step once the tests pass without errors
+#    - name: Run tests with coverage and dummy hmcode patch
+#      run: |
+#        python -c "import dummy_hmcode"
+#        pytest --cov=cloe --cov-report=xml
+#        ls -l coverage.xml
+#        head -20 coverage.xml
+
+#    - name: Upload coverage to Codecov
+#      uses: codecov/codecov-action@v3
+#      with:
+#        files: coverage.xml
+#        flags: unittests
+#        fail_ci_if_error: true
