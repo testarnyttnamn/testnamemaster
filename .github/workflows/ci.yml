@@ -16,7 +16,7 @@ jobs:
 
     - name: Comment out pyhmcode import in nonlinear.py for CI
       run: |
-        sed -i '15 s/^/## /' cloe/nonlinear/nonlinear.py
+        sed -i '15 s/^/## /' cloe/non_linear/nonlinear.py
 
     - name: Remove pyhmcode from environment.yml on CI
       if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
