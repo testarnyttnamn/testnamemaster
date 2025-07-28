@@ -1,4 +1,4 @@
-[![pipeline status](https://gitlab.euclid-sgs.uk/pf-ist-likelihood/likelihood-implementation/badges/master/pipeline.svg)](https://gitlab.euclid-sgs.uk/pf-ist-likelihood/likelihood-implementation/commits/master) [![coverage report](https://gitlab.euclid-sgs.uk/pf-ist-likelihood/likelihood-implementation/badges/master/coverage.svg)](https://gitlab.euclid-sgs.uk/pf-ist-likelihood/likelihood-implementation/commits/master)
+[![codecov](https://codecov.io/gh/testarnyttnamn/testnamemaster/branch/main/graph/badge.svg)](https://codecov.io/gh/testarnyttnamn/testnamemaster)
 
 # CLOE: Cosmology Likelihood for Observables in Euclid
 
