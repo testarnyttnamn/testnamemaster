@@ -56,8 +56,7 @@ jobs:
 
       - name: Create dummy hmcode module patch
         run: |
-          echo "
-import sys
+          echo "import sys
 import types
 
 class DummyHMCode(types.ModuleType):
