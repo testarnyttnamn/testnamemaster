@@ -2,7 +2,7 @@
 
 # CLOE: Cosmology Likelihood for Observables in Euclid
 
-![Logo](./docs/other/cloelogo_notext.pdf)
+![Logo](./docs/other/cloelogo_notext.png)
 
 This repository allows the user to obtain model predictions and cosmological parameter constraints for synthetic and real Euclid data. It is developed by the Inter-Science Taskforce for Likelihood (IST:L) within the Euclid Consortium, in close collaboration with all of the Euclid Science Working Groups, Organisational Units, and the Inter-Science Taskforce for Nonlinear effects (IST:NL).
 
