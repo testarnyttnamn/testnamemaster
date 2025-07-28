@@ -7,17 +7,14 @@ on:
       - main
       - ci-debug
   pull_request:
-    branches:
-      - master
-      - main
-      - ci-debug
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
     - name: Remove pyhmcode from environment.yml on CI
       run: |
@@ -55,32 +52,27 @@ jobs:
 
     - name: Create dummy hmcode module patch
       run: |
-        echo "import sys" > dummy_hmcode.py
-        echo "import types" >> dummy_hmcode.py
-        echo "" >> dummy_hmcode.py
-        echo "class DummyHMCode(types.ModuleType):" >> dummy_hmcode.py
-        echo "    def __getattr__(self, name):" >> dummy_hmcode.py
-        echo "        def dummy(*args, **kwargs):" >> dummy_hmcode.py
-        echo "            return None" >> dummy_hmcode.py
-        echo "        return dummy" >> dummy_hmcode.py
-        echo "" >> dummy_hmcode.py
-        echo "sys.modules['hmcode'] = DummyHMCode('hmcode')" >> dummy_hmcode.py
+        echo "
+import sys
+import types
 
-    - name: Run tests without coverage (debug)
+class DummyHMCode(types.ModuleType):
+    def __getattr__(self, name):
+        def dummy(*args, **kwargs):
+            return None
+        return dummy
+
+sys.modules['hmcode'] = DummyHMCode('hmcode')
+" > dummy_hmcode.py
+
+    - name: Run tests with coverage using dummy hmcode patch
       run: |
-        pytest -v -s
+        conda run -n cloe python -c "import dummy_hmcode" 
+        conda run -n cloe pytest --cov=cloe --cov-report=xml
 
-# You can uncomment the coverage step once the tests pass without errors
-#    - name: Run tests with coverage and dummy hmcode patch
-#      run: |
-#        python -c "import dummy_hmcode"
-#        pytest --cov=cloe --cov-report=xml
-#        ls -l coverage.xml
-#        head -20 coverage.xml
-
-#    - name: Upload coverage to Codecov
-#      uses: codecov/codecov-action@v3
-#      with:
-#        files: coverage.xml
-#        flags: unittests
-#        fail_ci_if_error: true
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: coverage.xml
+        flags: unittests
+        fail_ci_if_error: true
