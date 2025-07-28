@@ -7,18 +7,22 @@ on:
       - main
       - ci-debug
   pull_request:
+    branches:
+      - master
+      - main
+      - ci-debug
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
-    - name: Remove pyhmcode from environment.yml on CI
+    - name: Create CI-specific environment file without pyhmcode
       run: |
-        sed -i '/pyhmcode/d' environment.yml
+        cp environment.yml environment-ci.yml
+        sed -i '/pyhmcode/d' environment-ci.yml
 
     - name: Install system dependencies
       run: |
@@ -31,28 +35,35 @@ jobs:
         auto-update-conda: true
         python-version: 3.9
         activate-environment: cloe
-        environment-file: environment.yml
+        environment-file: environment-ci.yml
         use-mamba: true
 
-    - name: Manually install pytest and pytest-cov
-      run: conda install -n cloe pytest pytest-cov -y
-
-    - name: Debug conda env update
+    - name: Ensure pyhmcode is not installed
       run: |
-        conda env update -n cloe -f environment.yml --prune -v
-        conda list -n cloe
+        conda activate cloe
+        mamba remove pyhmcode -y || true
+        mamba install pytest pytest-cov -y
+
+    - name: Debug conda environment
+      run: |
+        conda activate cloe
+        mamba env update -n cloe -f environment-ci.yml --prune -v
+        mamba list -n cloe
+        python -c "import sys; print(sys.path)"
+        python -c "import hmcode; print(hmcode)" || echo "hmcode import failed"
 
     - name: Cache pytest cache
       uses: actions/cache@v3
       with:
         path: .pytest_cache
-        key: ${{ runner.os }}-pytest-${{ hashFiles('**/environment.yml') }}-${{ github.sha }}
+        key: ${{ runner.os }}-pytest-${{ hashFiles('**/environment-ci.yml') }}-${{ github.sha }}
         restore-keys: |
           ${{ runner.os }}-pytest-
 
-    - name: Create dummy hmcode module patch
+    - name: Create dummy hmcode module
       run: |
-        echo "
+        mkdir -p cloe
+        cat << 'EOF' > cloe/hmcode.py
 import sys
 import types
 
@@ -63,13 +74,17 @@ class DummyHMCode(types.ModuleType):
         return dummy
 
 sys.modules['hmcode'] = DummyHMCode('hmcode')
-" > dummy_hmcode.py
+EOF
+        ls -l cloe/hmcode.py
 
-    - name: Run tests with dummy hmcode patch and coverage
+    - name: Run tests with coverage
       run: |
-        echo 'import dummy_hmcode' > test_wrapper.py
-        echo 'import pytest; raise SystemExit(pytest.main(["--cov=cloe", "--cov-report=xml"]))' >> test_wrapper.py
-        conda run -n cloe python test_wrapper.py
+        conda activate cloe
+        python -m pytest --cov=cloe --cov-report=xml -v || { echo "pytest failed with exit code $?"; exit 1; }
+        ls -l coverage.xml || echo "coverage.xml not found"
+        head -20 coverage.xml || echo "Failed to display coverage.xml"
+      env:
+        PYTHONPATH: ${{ github.workspace }}/cloe:$PYTHONPATH
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
