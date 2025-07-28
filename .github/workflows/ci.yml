@@ -55,18 +55,16 @@ jobs:
 
     - name: Create dummy hmcode module patch
       run: |
-        cat << EOF > dummy_hmcode.py
-import sys
-import types
-
-class DummyHMCode(types.ModuleType):
-    def __getattr__(self, name):
-        def dummy(*args, **kwargs):
-            return None
-        return dummy
-
-sys.modules['hmcode'] = DummyHMCode('hmcode')
-EOF
+        echo "import sys" > dummy_hmcode.py
+        echo "import types" >> dummy_hmcode.py
+        echo "" >> dummy_hmcode.py
+        echo "class DummyHMCode(types.ModuleType):" >> dummy_hmcode.py
+        echo "    def __getattr__(self, name):" >> dummy_hmcode.py
+        echo "        def dummy(*args, **kwargs):" >> dummy_hmcode.py
+        echo "            return None" >> dummy_hmcode.py
+        echo "        return dummy" >> dummy_hmcode.py
+        echo "" >> dummy_hmcode.py
+        echo "sys.modules['hmcode'] = DummyHMCode('hmcode')" >> dummy_hmcode.py
 
     - name: Run tests with coverage and dummy hmcode patch
       run: |
