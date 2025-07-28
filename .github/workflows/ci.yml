@@ -17,13 +17,13 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential gfortran
+        sudo apt-get install -y build-essential gfortran make python3-dev python3-distutils
 
     - name: Set up Miniconda
       uses: conda-incubator/setup-miniconda@v2
       with:
         auto-update-conda: true
-        python-version: 3.9  # match your env's python version
+        python-version: 3.9
         activate-environment: cloe
         environment-file: environment.yml
         use-mamba: true
