@@ -14,14 +14,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Comment out pyhmcode import in nonlinear.py for CI
-      run: |
-        sed -i '15 s/^/## /' cloe/non_linear/nonlinear.py
-
-    - name: Append hmcode mock to nonlinear.py for CI
-      run: |
-        echo -e "\n# Mock hmcode to avoid NameError during CI tests\nclass DummyHmcode:\n    def __getattr__(self, name):\n        def dummy(*args, **kwargs):\n            return None\n        return dummy\n\nhmcode = DummyHmcode()\n" >> cloe/non_linear/nonlinear.py
-
     - name: Remove pyhmcode from environment.yml on CI
       if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
       run: |
@@ -57,9 +49,24 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pytest-
 
-    - name: Run tests with coverage
+    - name: Create dummy hmcode module patch
       run: |
-        conda run -n cloe pytest --cov=cloe --cov-report=xml
+        echo "
+import sys
+import types
+
+class DummyHMCode(types.ModuleType):
+    def __getattr__(self, name):
+        def dummy(*args, **kwargs):
+            return None
+        return dummy
+
+sys.modules['hmcode'] = DummyHMCode('hmcode')
+" > dummy_hmcode.py
+
+    - name: Run tests with coverage and dummy hmcode patch
+      run: |
+        python -c "import dummy_hmcode" -m pytest --cov=cloe --cov-report=xml
         ls -l coverage.xml
         head -20 coverage.xml
 
