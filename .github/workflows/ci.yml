@@ -50,7 +50,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pytest-
 
-    - name: Create dummy hmcode patch
+    - name: Create dummy hmcode module patch
       run: |
         echo "
 import sys
@@ -67,9 +67,10 @@ sys.modules['hmcode'] = DummyHMCode('hmcode')
 
     - name: Run tests with coverage and dummy hmcode patch
       run: |
-        echo "import dummy_hmcode" > test_runner.py
-        echo "import pytest; raise SystemExit(pytest.main(['--cov=cloe', '--cov-report=xml']))" >> test_runner.py
-        python test_runner.py
+        python -c "import dummy_hmcode"
+        pytest --cov=cloe --cov-report=xml
+        ls -l coverage.xml
+        head -20 coverage.xml
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
