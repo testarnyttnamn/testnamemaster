@@ -14,6 +14,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Remove pyhmcode from environment.yml on CI
+      if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
+      run: |
+        sed -i '/pyhmcode/d' environment.yml
+
     - name: Install system dependencies
       run: |
         sudo apt-get update
