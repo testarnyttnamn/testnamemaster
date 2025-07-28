@@ -1,8 +1,8 @@
-[![pipeline status](https://gitlab.euclid-sgs.uk/pf-ist-likelihood/likelihood-implementation/badges/master/pipeline.svg)](https://gitlab.euclid-sgs.uk/pf-ist-likelihood/likelihood-implementation/commits/master) [![coverage report](https://gitlab.euclid-sgs.uk/pf-ist-likelihood/likelihood-implementation/badges/master/coverage.svg)](https://gitlab.euclid-sgs.uk/pf-ist-likelihood/likelihood-implementation/commits/master)
+[![codecov](https://codecov.io/gh/testarnyttnamn/testnamemaster/branch/main/graph/badge.svg)](https://codecov.io/gh/testarnyttnamn/testnamemaster)
 
 # CLOE: Cosmology Likelihood for Observables in Euclid
 
-<img src="./docs/other/cloelogo_notext.png" alt="Logo" width="400" />
+<img src="./docs/other/cloelogo_notext.png" alt="Logo" width="410" />
 
 This repository allows the user to obtain model predictions and cosmological parameter constraints for synthetic and real Euclid data. It is developed by the Inter-Science Taskforce for Likelihood (IST:L) within the Euclid Consortium, in close collaboration with all of the Euclid Science Working Groups, Organisational Units, and the Inter-Science Taskforce for Nonlinear effects (IST:NL).
 
