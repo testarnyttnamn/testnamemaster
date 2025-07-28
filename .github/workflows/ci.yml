@@ -23,6 +23,11 @@ jobs:
         environment-file: environment.yml
         use-mamba: true
 
+    - name: Debug conda env update
+      run: |
+        conda env update -n cloe -f environment.yml --prune -v
+        conda list -n cloe
+
     - name: Cache pytest cache
       uses: actions/cache@v3
       with:
