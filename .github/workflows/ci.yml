@@ -25,7 +25,6 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     env:
-      # ensure colored pytest output
       PYTHONUNBUFFERED: 1
 
     steps:
@@ -36,7 +35,7 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: registry.gitlab.euclid-sgs.uk
-          username: ${{ secrets.GITLAB_USERNAME }}
+          username: sjoudaki
           password: ${{ secrets.TESTING }}
 
       - name: Pull pre-built image
