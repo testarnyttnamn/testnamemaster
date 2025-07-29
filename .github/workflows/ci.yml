@@ -2,7 +2,6 @@ name: CI via Pre-built Docker Image
 
 on:
   push:
-    branches: [ master, ci-debug ]
     paths:
       - 'cloe/**'
       - 'configs/**'
@@ -11,7 +10,6 @@ on:
       - '.github/workflows/ci.yml'
       - 'setup.py'
   pull_request:
-    branches: [ master, ci-debug ]
     paths:
       - 'cloe/**'
       - 'configs/**'
@@ -25,14 +23,8 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     env:
-      # use head_ref on PRs;
-      # 'latest' on master;
-      # 'ci-debug' on that branch;
-      # otherwise also 'latest'
-      IMAGE_TAG: ${{ github.event_name == 'pull_request' && github.head_ref
-                     || (github.ref == 'refs/heads/master'   && 'latest')
-                     || (github.ref == 'refs/heads/ci-debug' && 'ci-debug')
-                     || 'latest' }}
+      # use head_ref on PRs, "latest" on master, else branch name
+      IMAGE_TAG: ${{ github.event_name == 'pull_request' && github.head_ref || (github.ref == 'refs/heads/master' && 'latest' || github.ref_name) }}
       PYTHONUNBUFFERED: 1
 
     steps:
