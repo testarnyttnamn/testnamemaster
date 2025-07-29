@@ -21,31 +21,46 @@ on:
       - 'setup.py'
   workflow_dispatch:
 
-env:
-  IMAGE: myregistry/myimage:latest
-  WORKDIR: /src
-
 jobs:
   tests:
     runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    env:
+      PIP_NO_BUILD_ISOLATION: "1"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Pull & run tests in Docker
+      - name: Install system dependencies
         run: |
-          docker pull $IMAGE
-          docker run --rm \
-            -v "$PWD":$WORKDIR -w $WORKDIR \
-            $IMAGE \
-            bash -lc "python -m pytest \
-              --verbose \
-              --pycodestyle \
-              --pydocstyle \
-              --cov=./ \
-              --cov-report=term \
-              --cov-report=xml=coverage.xml \
-              --junitxml=pytest.xml"
+          sudo apt-get update
+          # Ubuntu 24.04 uses Python 3.11 packages
+          sudo apt-get install -y python3.11-distutils python3-setuptools build-essential
+
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: "3.9"
+          environment-file: environment.yml
+          activate-environment: cloe
+
+      - name: Confirm environment
+        run: |
+          conda list
+          which python
+
+      - name: Run pytest with coverage
+        run: |
+          python -m pytest \
+            --verbose \
+            --pycodestyle \
+            --pydocstyle \
+            --cov=./ \
+            --cov-report=term \
+            --cov-report=xml=coverage.xml \
+            --junitxml=pytest.xml
 
       - name: Upload JUnit report
         uses: actions/upload-artifact@v4
@@ -62,17 +77,27 @@ jobs:
   verification:
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
+    env:
+      PIP_NO_BUILD_ISOLATION: "1"
     steps:
       - uses: actions/checkout@v4
 
-      - name: Pull & run verification suite
+      - name: Install system dependencies
         run: |
-          docker pull $IMAGE
-          docker run --rm \
-            -v "$PWD":$WORKDIR -w $WORKDIR \
-            $IMAGE \
-            bash -lc "export TF_CPP_MIN_LOG_LEVEL=1 && \
-              python -m pytest cloe/tests/verification --junitxml=verification.xml"
+          sudo apt-get update
+          sudo apt-get install -y python3.11-distutils python3-setuptools build-essential
+
+      - name: Set up Miniconda & CLI deps
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: "3.9"
+          environment-file: environment.yml
+          activate-environment: cloe
+
+      - name: Run verification suite
+        run: |
+          export TF_CPP_MIN_LOG_LEVEL=1
+          python -m pytest cloe/tests/verification --junitxml=verification.xml
 
       - name: Upload verification report
         uses: actions/upload-artifact@v4
@@ -83,18 +108,28 @@ jobs:
   docs_review:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
+    env:
+      PIP_NO_BUILD_ISOLATION: "1"
     steps:
       - uses: actions/checkout@v4
 
-      - name: Pull & build Sphinx docs
+      - name: Install system dependencies
         run: |
-          docker pull $IMAGE
-          docker run --rm \
-            -v "$PWD":$WORKDIR -w $WORKDIR \
-            $IMAGE \
-            bash -lc "mkdir -p docs/build && \
-              sphinx-apidoc --module-first -feo docs/source cloe && \
-              sphinx-build docs/source docs/build"
+          sudo apt-get update
+          sudo apt-get install -y python3.11-distutils python3-setuptools build-essential
+
+      - name: Set up Miniconda & docs deps
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: "3.9"
+          environment-file: environment.yml
+          activate-environment: cloe
+
+      - name: Build Sphinx docs
+        run: |
+          mkdir -p docs/build
+          sphinx-apidoc --module-first -feo docs/source cloe
+          sphinx-build docs/source docs/build
 
       - name: Upload HTML build
         uses: actions/upload-artifact@v4
@@ -107,18 +142,28 @@ jobs:
     if: >
       github.event_name == 'push' &&
       github.ref == 'refs/heads/main'
+    env:
+      PIP_NO_BUILD_ISOLATION: "1"
     steps:
       - uses: actions/checkout@v4
 
-      - name: Pull & deploy docs to GH Pages
+      - name: Install system dependencies
         run: |
-          docker pull $IMAGE
-          docker run --rm \
-            -v "$PWD":$WORKDIR -w $WORKDIR \
-            $IMAGE \
-            bash -lc "mkdir -p docs/build && \
-              sphinx-apidoc --module-first -feo docs/source cloe && \
-              sphinx-build docs/source docs/build"
+          sudo apt-get update
+          sudo apt-get install -y python3.11-distutils python3-setuptools build-essential
+
+      - name: Set up Miniconda & docs deps
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: "3.9"
+          environment-file: environment.yml
+          activate-environment: cloe
+
+      - name: Build Sphinx docs
+        run: |
+          mkdir -p docs/build
+          sphinx-apidoc --module-first -feo docs/source cloe
+          sphinx-build docs/source docs/build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v5
@@ -130,20 +175,28 @@ jobs:
   profiling:
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
+    env:
+      PIP_NO_BUILD_ISOLATION: "1"
     steps:
       - uses: actions/checkout@v4
 
-      - name: Pull & run profiling
+      - name: Install system dependencies
         run: |
-          docker pull $IMAGE
-          docker run --rm \
-            -v "$PWD":$WORKDIR -w $WORKDIR \
-            $IMAGE \
-            bash -lc "mkdir -p products && \
-              python -m cProfile -o products/evaluate_likelihood.pstats \
-                run_cloe.py configs/config_profiling_evaluate_likelihood.yaml && \
-              python -m cProfile -o products/mcmc.pstats \
-                run_cloe.py configs/config_profiling_mcmc.yaml"
+          sudo apt-get update
+          sudo apt-get install -y python3.11-distutils python3-setuptools build-essential
+
+      - name: Set up Miniconda & CLI deps
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: "3.9"
+          environment-file: environment.yml
+          activate-environment: cloe
+
+      - name: Run profiling
+        run: |
+          mkdir -p products
+          python -m cProfile -o products/evaluate_likelihood.pstats run_cloe.py configs/config_profiling_evaluate_likelihood.yaml
+          python -m cProfile -o products/mcmc.pstats run_cloe.py configs/config_profiling_mcmc.yaml
 
       - name: Upload profiling artifacts
         uses: actions/upload-artifact@v4
