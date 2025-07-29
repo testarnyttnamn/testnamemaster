@@ -1,4 +1,4 @@
-name: cloe
+name: cloetryz
 channels:
   - conda-forge
 dependencies:
@@ -40,7 +40,7 @@ dependencies:
     - git+https://bitbucket.org/rangulo/baccoemu.git@7e0ca8b
     - BCemu==1.1
     - euclidemu2==1.2.1
-    - git+https://github.com/tilmantroester/pyhmcode.git@v1.0.0
+    - pyhmcode==1.0.0
     - euclidlib==0.0.5
     # Unit testing and documentation dependencies (from PyPI)
     - pytest-pydocstyle==2.3.2
