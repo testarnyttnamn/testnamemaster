@@ -1,4 +1,4 @@
-name: Build & Push Docker Image
+name: Build and Push Docker Image
 
 on:
   push:
@@ -7,38 +7,32 @@ on:
       - master
 
 jobs:
-  build-and-push:
+  build-push:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+      # Figure out whether we're on master (-> latest) or ci-debug (-> ci-debug)
+      - name: Determine tag
+        run: |
+          if [ "$GITHUB_REF" = "refs/heads/master" ]; then
+            echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+          else
+            echo "IMAGE_TAG=ci-debug" >> $GITHUB_ENV
+          fi
 
-      - name: Log in to GitHub Container Registry
+      - name: Log in to GHCR
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_PAT }}
+          password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Build & push image
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/testnamemaster:ci-debug
-            ghcr.io/${{ github.repository_owner }}/testnamemaster:latest
-
-      - name: Confirm pushed
-        run: |
-          echo "ci-debug digest:"
-          docker manifest inspect ghcr.io/${{ github.repository_owner }}/testnamemaster:ci-debug
-          echo "latest digest:"
-          docker manifest inspect ghcr.io/${{ github.repository_owner }}/testnamemaster:latest
+          tags: ghcr.io/testarnyttnamn/testnamemaster:${{ env.IMAGE_TAG }}
