@@ -2,7 +2,6 @@ name: CI Pipeline
 
 on:
   pull_request:
-    # only run on relevant changes
     paths:
       - 'cloe/**'
       - 'configs/**'
@@ -20,41 +19,46 @@ on:
       - 'setup.cfg'
       - '.github/workflows/ci.yml'
       - 'setup.py'
-  workflow_dispatch:  # for manual Verification & Profiling
+  workflow_dispatch:
 
 jobs:
-  # ------------------------------
-  # 1. Unit tests + coverage
-  # ------------------------------
+  # ---------------------------------------------------
+  # 1. Unit tests + coverage (on PRs & pushes to main)
+  # ---------------------------------------------------
   tests:
-    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main') }}
     runs-on: ubuntu-latest
-    container:
-      image: gitlab.euclid-sgs.uk:4567/pf-ist-likelihood/likelihood-implementation
-      credentials:
-        username: ${{ secrets.REGISTRY_USER }}
-        password: ${{ secrets.REGISTRY_TOKEN }}
+    if: >
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main')
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Show environment & sources
-        run: |
-          source activate cloe
-          conda list
-          ls -a
-          echo "${{ github.event_name }}"
+      - name: Log in to GitLab Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: gitlab.euclid-sgs.uk:4567
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
 
-      - name: Run pytest with coverage
-        run: |
-          python -m pytest \
-            --verbose \
-            --pycodestyle \
-            --pydocstyle \
-            --cov=./ \
-            --cov-report=term \
-            --cov-report=xml=coverage.xml \
-            --junitxml=pytest.xml
+      - name: Run in custom container
+        uses: addnab/docker-run-action@v3
+        with:
+          image: gitlab.euclid-sgs.uk:4567/pf-ist-likelihood/likelihood-implementation
+          options: --entrypoint /bin/bash
+          run: |
+            source activate cloe
+            conda list
+            ls -a
+            echo "${{ github.event_name }}"
+            python -m pytest \
+              --verbose \
+              --pycodestyle \
+              --pydocstyle \
+              --cov=./ \
+              --cov-report=term \
+              --cov-report=xml=coverage.xml \
+              --junitxml=pytest.xml
 
       - name: Upload JUnit report
         uses: actions/upload-artifact@v3
@@ -68,72 +72,82 @@ jobs:
           name: coverage-report
           path: coverage.xml
 
-  # ------------------------------
-  # 2. Verification tests (manual)
-  # ------------------------------
+  # --------------------------------------------
+  # 2. Verification tests (manual trigger only)
+  # --------------------------------------------
   verification:
-    if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
-    container:
-      image: gitlab.euclid-sgs.uk:4567/pf-ist-likelihood/likelihood-implementation
-      credentials:
-        username: ${{ secrets.REGISTRY_USER }}
-        password: ${{ secrets.REGISTRY_TOKEN }}
+    if: github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v4
+
+      - name: Log in to GitLab Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: gitlab.euclid-sgs.uk:4567
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+
       - name: Run verification suite
-        run: |
-          export TF_CPP_MIN_LOG_LEVEL=1
-          python -m pytest cloe/tests/verification --junitxml=verification.xml
+        uses: addnab/docker-run-action@v3
+        with:
+          image: gitlab.euclid-sgs.uk:4567/pf-ist-likelihood/likelihood-implementation
+          options: --entrypoint /bin/bash
+          run: |
+            export TF_CPP_MIN_LOG_LEVEL=1
+            python -m pytest cloe/tests/verification --junitxml=verification.xml
+
       - name: Upload verification report
         uses: actions/upload-artifact@v3
         with:
           name: verification-report
           path: verification.xml
 
-  # ------------------------------
-  # 3. Build API docs for PR review (manual on PR)
-  # ------------------------------
+  # -----------------------------------------------------
+  # 3. Build API docs for PR review (on pull_request only)
+  # -----------------------------------------------------
   docs_review:
-    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
-    container:
-      image: gitlab.euclid-sgs.uk:4567/pf-ist-likelihood/likelihood-implementation
-      credentials:
-        username: ${{ secrets.REGISTRY_USER }}
-        password: ${{ secrets.REGISTRY_TOKEN }}
+    if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
-      - name: Build Sphinx docs
-        run: |
-          mkdir -p docs/build
-          sphinx-apidoc --module-first -feo docs/source cloe
-          sphinx-build docs/source docs/build
+
+      - name: Log in & build Sphinx docs
+        uses: addnab/docker-run-action@v3
+        with:
+          image: gitlab.euclid-sgs.uk:4567/pf-ist-likelihood/likelihood-implementation
+          options: --entrypoint /bin/bash
+          run: |
+            mkdir -p docs/build
+            sphinx-apidoc --module-first -feo docs/source cloe
+            sphinx-build docs/source docs/build
+
       - name: Upload HTML build
         uses: actions/upload-artifact@v3
         with:
           name: html-build
           path: docs/build
 
-  # ------------------------------
-  # 4. Publish docs to GitHub Pages
-  # ------------------------------
+  # ---------------------------------------------------
+  # 4. Publish docs to GitHub Pages (push to main branch)
+  # ---------------------------------------------------
   pages:
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
-    container:
-      image: gitlab.euclid-sgs.uk:4567/pf-ist-likelihood/likelihood-implementation
-      credentials:
-        username: ${{ secrets.REGISTRY_USER }}
-        password: ${{ secrets.REGISTRY_TOKEN }}
+    if: >
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build Sphinx docs
-        run: |
-          mkdir -p docs/build
-          sphinx-apidoc --module-first -feo docs/source cloe
-          sphinx-build docs/source docs/build
+      - name: Log in & build Sphinx docs
+        uses: addnab/docker-run-action@v3
+        with:
+          image: gitlab.euclid-sgs.uk:4567/pf-ist-likelihood/likelihood-implementation
+          options: --entrypoint /bin/bash
+          run: |
+            mkdir -p docs/build
+            sphinx-apidoc --module-first -feo docs/source cloe
+            sphinx-build docs/source docs/build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v5
@@ -142,24 +156,32 @@ jobs:
           publish_dir: docs/build
           publish_branch: gh-pages
 
-  # ------------------------------
-  # 5. Profiling reports (manual)
-  # ------------------------------
+  # --------------------------------------------
+  # 5. Profiling reports (manual trigger only)
+  # --------------------------------------------
   profiling:
-    if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
-    container:
-      image: gitlab.euclid-sgs.uk:4567/pf-ist-likelihood/likelihood-implementation
-      credentials:
-        username: ${{ secrets.REGISTRY_USER }}
-        password: ${{ secrets.REGISTRY_TOKEN }}
+    if: github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v4
+
+      - name: Log in to GitLab Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: gitlab.euclid-sgs.uk:4567
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+
       - name: Run profiling
-        run: |
-          python -m cProfile -o products/evaluate_likelihood.pstats run_cloe.py configs/config_profiling_evaluate_likelihood.yaml
-          python -m cProfile -o products/mcmc.pstats run_cloe.py configs/config_profiling_mcmc.yaml
-          ls products
+        uses: addnab/docker-run-action@v3
+        with:
+          image: gitlab.euclid-sgs.uk:4567/pf-ist-likelihood/likelihood-implementation
+          options: --entrypoint /bin/bash
+          run: |
+            mkdir -p products
+            python -m cProfile -o products/evaluate_likelihood.pstats run_cloe.py configs/config_profiling_evaluate_likelihood.yaml
+            python -m cProfile -o products/mcmc.pstats run_cloe.py configs/config_profiling_mcmc.yaml
+
       - name: Upload profiling artifacts
         uses: actions/upload-artifact@v3
         with:
