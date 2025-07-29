@@ -1,20 +1,21 @@
-name: Build and Publish Docker Image
+name: Build & Push Docker Image
 
 on:
   push:
-    branches:
-      - master          # or 'main' if your default branch is main
+    branches: [ ci-debug ]
     paths:
       - 'Dockerfile'
       - 'environment.yml'
+      - 'setup.cfg'
+      - 'setup.py'
+      - 'cloe/**'
       - '.github/workflows/build-and-push-image.yml'
-  workflow_dispatch:
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Log in to GitHub Container Registry
@@ -24,12 +25,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_PAT }}
 
-      - name: Build Docker image
-        run: |
-          IMAGE=ghcr.io/testarnyttnamn/testnamemaster:latest    # ← update to your org/repo
-          docker build -t "$IMAGE" .
-
-      - name: Push Docker image
-        run: |
-          IMAGE=ghcr.io/testarnyttnamn/testnamemaster:latest    # ← same tag as above
-          docker push "$IMAGE"
+      - name: Build and push image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/testarnyttnamn/testnamemaster:latest
