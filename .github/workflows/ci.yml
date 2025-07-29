@@ -1,0 +1,73 @@
+name: CI via Pre-built Docker Image
+
+on:
+  push:
+    branches: [ master, ci-debug ]
+    paths:
+      - 'cloe/**'
+      - 'configs/**'
+      - 'environment.yml'
+      - 'setup.cfg'
+      - '.github/workflows/ci.yml'
+      - 'setup.py'
+  pull_request:
+    branches: [ master, ci-debug ]
+    paths:
+      - 'cloe/**'
+      - 'configs/**'
+      - 'environment.yml'
+      - 'setup.cfg'
+      - '.github/workflows/ci.yml'
+      - 'setup.py'
+  workflow_dispatch:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    env:
+      # use head_ref on PRs, "latest" on master, else branch name
+      IMAGE_TAG: ${{ github.event_name == 'pull_request' && github.head_ref || (github.ref == 'refs/heads/master' && 'latest' || github.ref_name) }}
+      PYTHONUNBUFFERED: 1
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Pull image & run tests
+        run: |
+          IMAGE=ghcr.io/testarnyttnamn/testnamemaster:${IMAGE_TAG}
+          echo "→ Pulling $IMAGE"
+          docker pull "$IMAGE"
+
+          echo "→ Running pytest inside $IMAGE"
+          docker run --rm \
+            -v "${{ github.workspace }}":/src \
+            -w /src \
+            "$IMAGE" \
+            bash -lc "conda activate cloe && \
+                       pytest --verbose \
+                              --pycodestyle \
+                              --pydocstyle \
+                              --junitxml=pytest.xml \
+                              --cov=./ \
+                              --cov-report=term \
+                              --cov-report=xml:coverage.xml"
+
+      - name: Upload JUnit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-report
+          path: pytest.xml
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
