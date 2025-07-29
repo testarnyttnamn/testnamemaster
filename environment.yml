@@ -1,4 +1,4 @@
-name: cloetryz
+name: cloe
 channels:
   - conda-forge
 dependencies:
