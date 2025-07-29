@@ -1,33 +1,143 @@
-name: Python CI
+name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - master
   pull_request:
-    branches: [ main ]
+    paths:
+      - 'cloe/**'
+      - 'configs/*'
+      - 'data/ExternalBenchmark/*'
+      - 'environment.yml'
+      - '.github/workflows/ci.yml'
+      - 'setup.cfg'
 
 jobs:
-  test:
+  tests:
+    name: Run Unit Tests
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Install build tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential gfortran make
-
-      - name: Set up conda
+      - name: Set up Conda
         uses: conda-incubator/setup-miniconda@v2
         with:
-          auto-update-conda: true
-          environment-file: environment.yml
           activate-environment: cloe
-          python-version: 3.9
-          use-mamba: true
+          environment-file: environment.yml
+          auto-activate-base: false
 
-      - name: Run tests with coverage
+      - name: Show Conda packages
+        run: conda list
+
+      - name: Run Unit Tests
+        run: python -m pytest --junitxml=pytest.xml --cov=cloe --cov-report=xml
+
+      - name: Upload coverage and test results
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: |
+            pytest.xml
+            coverage.xml
+
+  verification:
+    name: Verification Tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: cloe
+          environment-file: environment.yml
+          auto-activate-base: false
+
+      - name: Run Verification Tests
         run: |
-          python -m pytest --cov=cloe --cov-report=term --cov-report=xml --junitxml=pytest.xml
+          export TF_CPP_MIN_LOG_LEVEL=1
+          python -m pytest cloe/tests/verification
+
+  docs:
+    name: Build API Docs
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: cloe
+          environment-file: environment.yml
+          auto-activate-base: false
+
+      - name: Build Docs
+        run: |
+          mkdir -p docs/build
+          sphinx-apidoc --module-first -feo docs/source cloe
+          sphinx-build docs/source docs/build
+          mv docs/build html_build
+
+      - name: Upload Docs Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: html-docs
+          path: html_build/
+
+  deploy-docs:
+    name: Deploy Docs to GitHub Pages
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: cloe
+          environment-file: environment.yml
+          auto-activate-base: false
+
+      - name: Build Docs for Pages
+        run: |
+          mkdir -p docs/build
+          sphinx-apidoc --module-first -feo docs/source cloe
+          sphinx-build docs/source docs/build
+          mv docs/build public
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+
+  profiling:
+    name: Run Profiling
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: cloe
+          environment-file: environment.yml
+          auto-activate-base: false
+
+      - name: Run Profiling
+        run: |
+          python -m cProfile -o evaluate_likelihood.pstats run_cloe.py configs/config_profiling_evaluate_likelihood.yaml
+          python -m cProfile -o mcmc.pstats run_cloe.py configs/config_profiling_mcmc.yaml
+          mkdir -p products
+          mv *.pstats products/
+
+      - name: Upload Profiling Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: profiling-report
+          path: products/
