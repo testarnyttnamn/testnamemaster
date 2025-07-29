@@ -2,7 +2,8 @@ name: CI via Pre-built Docker Image
 
 on:
   push:
-    branches: [ master, codecov ]
+    # run on every branch now
+    branches: [ '**' ]
     paths:
       - 'cloe/**'
       - 'configs/**'
@@ -11,7 +12,7 @@ on:
       - '.github/workflows/ci.yml'
       - 'setup.py'
   pull_request:
-    branches: [ master, codecov ]
+    branches: [ '**' ]
     paths:
       - 'cloe/**'
       - 'configs/**'
@@ -25,8 +26,14 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     env:
-      # use head_ref on PRs, "latest" on master, else branch name
-      IMAGE_TAG: ${{ github.event_name == 'pull_request' && github.head_ref || (github.ref == 'refs/heads/master' && 'latest' || github.ref_name) }}
+      # if PR use head_ref;
+      # if master use 'latest';
+      # if ci-debug use 'ci-debug';
+      # otherwise fallback to 'latest'
+      IMAGE_TAG: ${{ github.event_name == 'pull_request' && github.head_ref
+                     || (github.ref == 'refs/heads/master' && 'latest')
+                     || (github.ref == 'refs/heads/ci-debug' && 'ci-debug')
+                     || 'latest' }}
       PYTHONUNBUFFERED: 1
 
     steps:
@@ -76,5 +83,4 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           files: coverage.xml
-          # If your repo is private, uncomment the next line and set the secret:
-          # token: ${{ secrets.CODECOV_TOKEN }}
+          # token: ${{ secrets.CODECOV_TOKEN }}  # only if your repo is private
