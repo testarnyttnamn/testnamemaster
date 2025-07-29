@@ -1,4 +1,4 @@
-name: CI via Pre-built Docker Image
+name: Continuous Integration
 
 on:
   push:
