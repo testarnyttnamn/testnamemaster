@@ -1,3 +1,4 @@
+# .github/workflows/ci-option2.yml
 name: CI via Pre-built Docker Image
 
 on:
@@ -31,22 +32,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Log in to GitLab Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: registry.gitlab.euclid-sgs.uk
-          username: sjoudaki
-          password: ${{ secrets.TESTING }}
+      - name: Login to GitLab Container Registry (insecure)
+        run: |
+          echo "${{ secrets.TESTING }}" \
+            | docker login registry.gitlab.euclid-sgs.uk \
+                --username sjoudaki \
+                --password-stdin \
+                --tls-verify=false
 
-      - name: Pull pre-built image
+      - name: Pull pre-built image (insecure)
         run: |
           IMAGE=registry.gitlab.euclid-sgs.uk/pf-ist-likelihood/likelihood-implementation:latest
-          docker pull "$IMAGE"
+          docker --tls-verify=false pull "$IMAGE"
 
       - name: Run tests inside container
         run: |
           IMAGE=registry.gitlab.euclid-sgs.uk/pf-ist-likelihood/likelihood-implementation:latest
-          docker run --rm \
+          docker --tls-verify=false run --rm \
             -v "${{ github.workspace }}":/src \
             -w /src \
             "$IMAGE" \
