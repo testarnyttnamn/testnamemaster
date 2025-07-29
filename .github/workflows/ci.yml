@@ -22,6 +22,9 @@ on:
   workflow_dispatch:
 
 jobs:
+  # -----------------------------------
+  # 1. Unit tests + coverage (auto)
+  # -----------------------------------
   tests:
     runs-on: ubuntu-latest
     if: >
@@ -31,31 +34,30 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Log in to GitLab Container Registry
-        uses: docker/login-action@v2
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2
         with:
-          registry: gitlab.euclid-sgs.uk:4567
-          username: ${{ secrets.REGISTRY_USER }}
-          password: ${{ secrets.REGISTRY_TOKEN }}
+          auto-update-conda: true
+          python-version: "3.9"
+          environment-file: environment.yml
+          activate-environment: cloe
+          cache-track: lock-file    # caches pkgs based on environment.yml
 
-      - name: Run in custom container
-        uses: addnab/docker-run-action@v3
-        with:
-          image: gitlab.euclid-sgs.uk:4567/pf-ist-likelihood/likelihood-implementation
-          options: --entrypoint /bin/bash
-          run: |
-            source activate cloe
-            conda list
-            ls -a
-            echo "${{ github.event_name }}"
-            python -m pytest \
-              --verbose \
-              --pycodestyle \
-              --pydocstyle \
-              --cov=./ \
-              --cov-report=term \
-              --cov-report=xml=coverage.xml \
-              --junitxml=pytest.xml
+      - name: Confirm environment
+        run: |
+          conda list
+          which python
+
+      - name: Run pytest with coverage
+        run: |
+          python -m pytest \
+            --verbose \
+            --pycodestyle \
+            --pydocstyle \
+            --cov=./ \
+            --cov-report=term \
+            --cov-report=xml=coverage.xml \
+            --junitxml=pytest.xml
 
       - name: Upload JUnit report
         uses: actions/upload-artifact@v4
@@ -69,27 +71,27 @@ jobs:
           name: coverage-report
           path: coverage.xml
 
+  # -----------------------------------------
+  # 2. Verification tests (manual trigger)
+  # -----------------------------------------
   verification:
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v4
 
-      - name: Log in to GitLab Container Registry
-        uses: docker/login-action@v2
+      - name: Set up Miniconda & CLI deps
+        uses: conda-incubator/setup-miniconda@v2
         with:
-          registry: gitlab.euclid-sgs.uk:4567
-          username: ${{ secrets.REGISTRY_USER }}
-          password: ${{ secrets.REGISTRY_TOKEN }}
+          python-version: "3.9"
+          environment-file: environment.yml
+          activate-environment: cloe
+          cache-track: lock-file
 
       - name: Run verification suite
-        uses: addnab/docker-run-action@v3
-        with:
-          image: gitlab.euclid-sgs.uk:4567/pf-ist-likelihood/likelihood-implementation
-          options: --entrypoint /bin/bash
-          run: |
-            export TF_CPP_MIN_LOG_LEVEL=1
-            python -m pytest cloe/tests/verification --junitxml=verification.xml
+        run: |
+          export TF_CPP_MIN_LOG_LEVEL=1
+          python -m pytest cloe/tests/verification --junitxml=verification.xml
 
       - name: Upload verification report
         uses: actions/upload-artifact@v4
@@ -97,21 +99,28 @@ jobs:
           name: verification-report
           path: verification.xml
 
+  # ------------------------------------------------
+  # 3. Build API docs for PR review (on pull_request)
+  # ------------------------------------------------
   docs_review:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
 
-      - name: Log in & build Sphinx docs
-        uses: addnab/docker-run-action@v3
+      - name: Set up Miniconda & docs deps
+        uses: conda-incubator/setup-miniconda@v2
         with:
-          image: gitlab.euclid-sgs.uk:4567/pf-ist-likelihood/likelihood-implementation
-          options: --entrypoint /bin/bash
-          run: |
-            mkdir -p docs/build
-            sphinx-apidoc --module-first -feo docs/source cloe
-            sphinx-build docs/source docs/build
+          python-version: "3.9"
+          environment-file: environment.yml
+          activate-environment: cloe
+          cache-track: lock-file
+
+      - name: Build Sphinx docs
+        run: |
+          mkdir -p docs/build
+          sphinx-apidoc --module-first -feo docs/source cloe
+          sphinx-build docs/source docs/build
 
       - name: Upload HTML build
         uses: actions/upload-artifact@v4
@@ -119,6 +128,9 @@ jobs:
           name: html-build
           path: docs/build
 
+  # ---------------------------------------------------------
+  # 4. Publish docs to GitHub Pages (push to main branch only)
+  # ---------------------------------------------------------
   pages:
     runs-on: ubuntu-latest
     if: >
@@ -127,15 +139,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Log in & build Sphinx docs
-        uses: addnab/docker-run-action@v3
+      - name: Set up Miniconda & docs deps
+        uses: conda-incubator/setup-miniconda@v2
         with:
-          image: gitlab.euclid-sgs.uk:4567/pf-ist-likelihood/likelihood-implementation
-          options: --entrypoint /bin/bash
-          run: |
-            mkdir -p docs/build
-            sphinx-apidoc --module-first -feo docs/source cloe
-            sphinx-build docs/source docs/build
+          python-version: "3.9"
+          environment-file: environment.yml
+          activate-environment: cloe
+          cache-track: lock-file
+
+      - name: Build Sphinx docs
+        run: |
+          mkdir -p docs/build
+          sphinx-apidoc --module-first -feo docs/source cloe
+          sphinx-build docs/source docs/build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v5
@@ -144,28 +160,28 @@ jobs:
           publish_dir: docs/build
           publish_branch: gh-pages
 
+  # ----------------------------------------
+  # 5. Profiling reports (manual trigger)
+  # ----------------------------------------
   profiling:
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v4
 
-      - name: Log in to GitLab Container Registry
-        uses: docker/login-action@v2
+      - name: Set up Miniconda & CLI deps
+        uses: conda-incubator/setup-miniconda@v2
         with:
-          registry: gitlab.euclid-sgs.uk:4567
-          username: ${{ secrets.REGISTRY_USER }}
-          password: ${{ secrets.REGISTRY_TOKEN }}
+          python-version: "3.9"
+          environment-file: environment.yml
+          activate-environment: cloe
+          cache-track: lock-file
 
       - name: Run profiling
-        uses: addnab/docker-run-action@v3
-        with:
-          image: gitlab.euclid-sgs.uk:4567/pf-ist-likelihood/likelihood-implementation
-          options: --entrypoint /bin/bash
-          run: |
-            mkdir -p products
-            python -m cProfile -o products/evaluate_likelihood.pstats run_cloe.py configs/config_profiling_evaluate_likelihood.yaml
-            python -m cProfile -o products/mcmc.pstats run_cloe.py configs/config_profiling_mcmc.yaml
+        run: |
+          mkdir -p products
+          python -m cProfile -o products/evaluate_likelihood.pstats run_cloe.py configs/config_profiling_evaluate_likelihood.yaml
+          python -m cProfile -o products/mcmc.pstats      run_cloe.py configs/config_profiling_mcmc.yaml
 
       - name: Upload profiling artifacts
         uses: actions/upload-artifact@v4
