@@ -1,23 +1,17 @@
 name: CI Pipeline
 
 on:
-  pull_request:
-    branches: [ master ]
+  pull_request: {}
   push:
-    branches: [ master ]
-  workflow_dispatch:
-
-env:
-  IMAGE_NAME: ghcr.io/testarnyttnamn/likelihood-implementation
-  IMAGE_TAG: latest
-  FULL_IMAGE: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+    branches:
+      - master
+  workflow_dispatch: {}
 
 jobs:
-  test_in_container:
-    name: Test (container)
-    if: github.event_name == 'pull_request'
+  build-and-push-image:
+    name: Build & Publish Docker Image
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -28,52 +22,49 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_PAT }}
 
-      - name: Prepare Docker image
+      - name: Build & tag image
         run: |
-          echo "➡️ Trying to pull pre-built image..."
-          if ! docker pull "$FULL_IMAGE"; then
-            echo "⚠️ Pull failed—building image locally."
-            docker build -t "$FULL_IMAGE" .
-          fi
+          docker build -t ghcr.io/${{ github.repository_owner }}/likelihood-implementation:latest .
 
-      - name: Run pytest inside container
+      - name: Push image
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/likelihood-implementation:latest
+
+  tests:
+    name: Run pytest inside the container
+    needs: build-and-push-image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
+
+      - name: Pull latest image
+        run: |
+          docker pull ghcr.io/${{ github.repository_owner }}/likelihood-implementation:latest
+
+      - name: Run pytest
         run: |
           docker run --rm \
             -v "${{ github.workspace }}":/src \
             -w /src \
-            "$FULL_IMAGE" \
+            ghcr.io/${{ github.repository_owner }}/likelihood-implementation:latest \
             bash -lc "pytest --verbose --pycodestyle --pydocstyle \
-                       --junitxml=pytest.xml \
-                       --cov=./ --cov-report=term --cov-report=xml=coverage.xml"
+              --junitxml=pytest.xml --cov=. --cov-report=xml=coverage.xml"
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload JUnit report
+        uses: actions/upload-artifact@v4
         with:
           name: junit-report
           path: pytest.xml
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: coverage.xml
-
-  build_and_push_image:
-    name: Build & Publish Image
-    if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Log in to GHCR
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_PAT }}
-
-      - name: Build & Push Docker image
-        run: |
-          echo "🔨 Building image $FULL_IMAGE"
-          docker build -t "$FULL_IMAGE" .
-          echo "📤 Pushing to GHCR"
-          docker push "$FULL_IMAGE"
