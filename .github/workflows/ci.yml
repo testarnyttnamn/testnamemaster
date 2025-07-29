@@ -22,14 +22,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  # -----------------------------------
-  # 1. Unit tests + coverage (auto)
-  # -----------------------------------
   tests:
     runs-on: ubuntu-latest
     if: >
       github.event_name == 'pull_request' ||
       (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    env:
+      PIP_NO_BUILD_ISOLATION: "1"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -37,11 +36,9 @@ jobs:
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v2
         with:
-          auto-update-conda: true
           python-version: "3.9"
           environment-file: environment.yml
           activate-environment: cloe
-          cache-track: lock-file    # caches pkgs based on environment.yml
 
       - name: Confirm environment
         run: |
@@ -71,12 +68,11 @@ jobs:
           name: coverage-report
           path: coverage.xml
 
-  # -----------------------------------------
-  # 2. Verification tests (manual trigger)
-  # -----------------------------------------
   verification:
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
+    env:
+      PIP_NO_BUILD_ISOLATION: "1"
     steps:
       - uses: actions/checkout@v4
 
@@ -86,7 +82,6 @@ jobs:
           python-version: "3.9"
           environment-file: environment.yml
           activate-environment: cloe
-          cache-track: lock-file
 
       - name: Run verification suite
         run: |
@@ -99,12 +94,11 @@ jobs:
           name: verification-report
           path: verification.xml
 
-  # ------------------------------------------------
-  # 3. Build API docs for PR review (on pull_request)
-  # ------------------------------------------------
   docs_review:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
+    env:
+      PIP_NO_BUILD_ISOLATION: "1"
     steps:
       - uses: actions/checkout@v4
 
@@ -114,7 +108,6 @@ jobs:
           python-version: "3.9"
           environment-file: environment.yml
           activate-environment: cloe
-          cache-track: lock-file
 
       - name: Build Sphinx docs
         run: |
@@ -128,14 +121,13 @@ jobs:
           name: html-build
           path: docs/build
 
-  # ---------------------------------------------------------
-  # 4. Publish docs to GitHub Pages (push to main branch only)
-  # ---------------------------------------------------------
   pages:
     runs-on: ubuntu-latest
     if: >
       github.event_name == 'push' &&
       github.ref == 'refs/heads/main'
+    env:
+      PIP_NO_BUILD_ISOLATION: "1"
     steps:
       - uses: actions/checkout@v4
 
@@ -145,7 +137,6 @@ jobs:
           python-version: "3.9"
           environment-file: environment.yml
           activate-environment: cloe
-          cache-track: lock-file
 
       - name: Build Sphinx docs
         run: |
@@ -160,12 +151,11 @@ jobs:
           publish_dir: docs/build
           publish_branch: gh-pages
 
-  # ----------------------------------------
-  # 5. Profiling reports (manual trigger)
-  # ----------------------------------------
   profiling:
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
+    env:
+      PIP_NO_BUILD_ISOLATION: "1"
     steps:
       - uses: actions/checkout@v4
 
@@ -175,13 +165,12 @@ jobs:
           python-version: "3.9"
           environment-file: environment.yml
           activate-environment: cloe
-          cache-track: lock-file
 
       - name: Run profiling
         run: |
           mkdir -p products
           python -m cProfile -o products/evaluate_likelihood.pstats run_cloe.py configs/config_profiling_evaluate_likelihood.yaml
-          python -m cProfile -o products/mcmc.pstats      run_cloe.py configs/config_profiling_mcmc.yaml
+          python -m cProfile -o products/mcmc.pstats run_cloe.py configs/config_profiling_mcmc.yaml
 
       - name: Upload profiling artifacts
         uses: actions/upload-artifact@v4
