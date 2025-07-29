@@ -1,18 +1,34 @@
-name: CI via Docker Image
+name: CI via Pre-built Docker Image
 
 on:
   pull_request:
-    branches: [ master ]
+    branches:
+      - ci-debug
+    paths:
+      - 'cloe/**'
+      - 'configs/**'
+      - 'environment.yml'
+      - 'setup.cfg'
+      - 'setup.py'
+      - '.github/workflows/ci.yml'
   push:
-    branches: [ master ]
+    branches:
+      - ci-debug
+    paths:
+      - 'cloe/**'
+      - 'configs/**'
+      - 'environment.yml'
+      - 'setup.cfg'
+      - 'setup.py'
+      - '.github/workflows/ci.yml'
   workflow_dispatch:
 
 jobs:
   tests:
     runs-on: ubuntu-latest
-    env:
-      # ensure pytest colors, etc.
-      PYTHONUNBUFFERED: 1
+    permissions:
+      contents: read       # read your code
+      packages: read       # pull from GHCR
 
     steps:
       - name: Checkout code
@@ -25,23 +41,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_PAT }}
 
-      - name: Pull pre-built image
+      - name: Pull & Run tests inside container
         run: |
-          docker pull ghcr.io/testarnyttnamn/testnamemaster:latest
-
-      - name: Run tests inside container
-        run: |
+          IMAGE=ghcr.io/${{ github.repository_owner }}/testnamemaster:ci-debug
+          docker pull "$IMAGE"
           docker run --rm \
             -v "${{ github.workspace }}":/src \
             -w /src \
-            ghcr.io/testarnyttnamn/testnamemaster:latest \
-            bash -lc "pytest --verbose \
-                               --pycodestyle \
-                               --pydocstyle \
-                               --junitxml=pytest.xml \
-                               --cov=./ \
-                               --cov-report=term \
-                               --cov-report=xml=coverage.xml"
+            "$IMAGE" \
+            bash -lc "pytest --verbose --pycodestyle --pydocstyle --junitxml=pytest.xml --cov=./ --cov-report=term --cov-report=xml=coverage.xml"
 
       - name: Upload JUnit report
         uses: actions/upload-artifact@v4
