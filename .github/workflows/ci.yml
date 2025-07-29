@@ -20,6 +20,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gfortran make gcc g++
+
       - name: Set up Conda
         uses: conda-incubator/setup-miniconda@v2
         with:
@@ -49,6 +54,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gfortran make gcc g++
+
       - name: Set up Conda
         uses: conda-incubator/setup-miniconda@v2
         with:
@@ -67,6 +77,11 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gfortran make gcc g++
 
       - name: Set up Conda
         uses: conda-incubator/setup-miniconda@v2
@@ -95,6 +110,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gfortran make gcc g++
+
       - name: Set up Conda
         uses: conda-incubator/setup-miniconda@v2
         with:
@@ -121,6 +141,11 @@ jobs:
     if: github.event_name == 'pull_request' || github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gfortran make gcc g++
 
       - name: Set up Conda
         uses: conda-incubator/setup-miniconda@v2
