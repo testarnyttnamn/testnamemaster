@@ -4,7 +4,6 @@ channels:
 dependencies:
   # Default Python version for CLOE
   - python=3.9
-  - python-distutils
   - pip==23.1.2
   - setuptools
   # Standard 3rd-party Python packages (from conda-forge)
