@@ -1,168 +1,167 @@
-name: CI
+name: CI Pipeline
 
 on:
-  push:
-    branches:
-      - master
   pull_request:
+    # only run on relevant changes
     paths:
       - 'cloe/**'
-      - 'configs/*'
-      - 'data/ExternalBenchmark/*'
+      - 'configs/**'
       - 'environment.yml'
-      - '.github/workflows/ci.yml'
       - 'setup.cfg'
+      - '.github/workflows/ci.yml'
+      - 'setup.py'
+  push:
+    branches:
+      - main
+    paths:
+      - 'cloe/**'
+      - 'configs/**'
+      - 'environment.yml'
+      - 'setup.cfg'
+      - '.github/workflows/ci.yml'
+      - 'setup.py'
+  workflow_dispatch:  # for manual Verification & Profiling
 
 jobs:
+  # ------------------------------
+  # 1. Unit tests + coverage
+  # ------------------------------
   tests:
-    name: Run Unit Tests
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main') }}
     runs-on: ubuntu-latest
+    container:
+      image: gitlab.euclid-sgs.uk:4567/pf-ist-likelihood/likelihood-implementation
+      credentials:
+        username: ${{ secrets.REGISTRY_USER }}
+        password: ${{ secrets.REGISTRY_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Install system dependencies
+      - name: Show environment & sources
         run: |
-          sudo apt-get update
-          sudo apt-get install -y gfortran make gcc g++
+          source activate cloe
+          conda list
+          ls -a
+          echo "${{ github.event_name }}"
 
-      - name: Set up Conda
-        uses: conda-incubator/setup-miniconda@v2
+      - name: Run pytest with coverage
+        run: |
+          python -m pytest \
+            --verbose \
+            --pycodestyle \
+            --pydocstyle \
+            --cov=./ \
+            --cov-report=term \
+            --cov-report=xml=coverage.xml \
+            --junitxml=pytest.xml
+
+      - name: Upload JUnit report
+        uses: actions/upload-artifact@v3
         with:
-          activate-environment: cloe
-          environment-file: environment.yml
-          auto-activate-base: false
+          name: junit-report
+          path: pytest.xml
 
-      - name: Show Conda packages
-        run: conda list
-
-      - name: Run Unit Tests
-        run: python -m pytest --junitxml=pytest.xml --cov=cloe --cov-report=xml
-
-      - name: Upload coverage and test results
-        if: success()
-        uses: actions/upload-artifact@v4
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
         with:
-          name: test-results
-          path: |
-            pytest.xml
-            coverage.xml
+          name: coverage-report
+          path: coverage.xml
 
+  # ------------------------------
+  # 2. Verification tests (manual)
+  # ------------------------------
   verification:
-    name: Verification Tests
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    container:
+      image: gitlab.euclid-sgs.uk:4567/pf-ist-likelihood/likelihood-implementation
+      credentials:
+        username: ${{ secrets.REGISTRY_USER }}
+        password: ${{ secrets.REGISTRY_TOKEN }}
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gfortran make gcc g++
-
-      - name: Set up Conda
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          activate-environment: cloe
-          environment-file: environment.yml
-          auto-activate-base: false
-
-      - name: Run Verification Tests
+      - name: Run verification suite
         run: |
           export TF_CPP_MIN_LOG_LEVEL=1
-          python -m pytest cloe/tests/verification
+          python -m pytest cloe/tests/verification --junitxml=verification.xml
+      - name: Upload verification report
+        uses: actions/upload-artifact@v3
+        with:
+          name: verification-report
+          path: verification.xml
 
-  docs:
-    name: Build API Docs
+  # ------------------------------
+  # 3. Build API docs for PR review (manual on PR)
+  # ------------------------------
+  docs_review:
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    container:
+      image: gitlab.euclid-sgs.uk:4567/pf-ist-likelihood/likelihood-implementation
+      credentials:
+        username: ${{ secrets.REGISTRY_USER }}
+        password: ${{ secrets.REGISTRY_TOKEN }}
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gfortran make gcc g++
-
-      - name: Set up Conda
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          activate-environment: cloe
-          environment-file: environment.yml
-          auto-activate-base: false
-
-      - name: Build Docs
+      - name: Build Sphinx docs
         run: |
           mkdir -p docs/build
           sphinx-apidoc --module-first -feo docs/source cloe
           sphinx-build docs/source docs/build
-          mv docs/build html_build
-
-      - name: Upload Docs Artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload HTML build
+        uses: actions/upload-artifact@v3
         with:
-          name: html-docs
-          path: html_build/
+          name: html-build
+          path: docs/build
 
-  deploy-docs:
-    name: Deploy Docs to GitHub Pages
+  # ------------------------------
+  # 4. Publish docs to GitHub Pages
+  # ------------------------------
+  pages:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    container:
+      image: gitlab.euclid-sgs.uk:4567/pf-ist-likelihood/likelihood-implementation
+      credentials:
+        username: ${{ secrets.REGISTRY_USER }}
+        password: ${{ secrets.REGISTRY_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gfortran make gcc g++
-
-      - name: Set up Conda
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          activate-environment: cloe
-          environment-file: environment.yml
-          auto-activate-base: false
-
-      - name: Build Docs for Pages
+      - name: Build Sphinx docs
         run: |
           mkdir -p docs/build
           sphinx-apidoc --module-first -feo docs/source cloe
           sphinx-build docs/source docs/build
-          mv docs/build public
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v5
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
+          publish_dir: docs/build
+          publish_branch: gh-pages
 
+  # ------------------------------
+  # 5. Profiling reports (manual)
+  # ------------------------------
   profiling:
-    name: Run Profiling
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/master'
+    container:
+      image: gitlab.euclid-sgs.uk:4567/pf-ist-likelihood/likelihood-implementation
+      credentials:
+        username: ${{ secrets.REGISTRY_USER }}
+        password: ${{ secrets.REGISTRY_TOKEN }}
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install system dependencies
+      - name: Run profiling
         run: |
-          sudo apt-get update
-          sudo apt-get install -y gfortran make gcc g++
-
-      - name: Set up Conda
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          activate-environment: cloe
-          environment-file: environment.yml
-          auto-activate-base: false
-
-      - name: Run Profiling
-        run: |
-          python -m cProfile -o evaluate_likelihood.pstats run_cloe.py configs/config_profiling_evaluate_likelihood.yaml
-          python -m cProfile -o mcmc.pstats run_cloe.py configs/config_profiling_mcmc.yaml
-          mkdir -p products
-          mv *.pstats products/
-
-      - name: Upload Profiling Report
-        uses: actions/upload-artifact@v4
+          python -m cProfile -o products/evaluate_likelihood.pstats run_cloe.py configs/config_profiling_evaluate_likelihood.yaml
+          python -m cProfile -o products/mcmc.pstats run_cloe.py configs/config_profiling_mcmc.yaml
+          ls products
+      - name: Upload profiling artifacts
+        uses: actions/upload-artifact@v3
         with:
           name: profiling-report
           path: products/
