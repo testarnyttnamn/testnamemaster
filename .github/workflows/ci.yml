@@ -71,3 +71,10 @@ jobs:
         with:
           name: coverage-report
           path: coverage.xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: coverage.xml
+          # If your repo is private, uncomment the next line and set the secret:
+          # token: ${{ secrets.CODECOV_TOKEN }}
