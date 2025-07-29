@@ -1,4 +1,3 @@
-# .github/workflows/ci-option2.yml
 name: CI via Pre-built Docker Image
 
 on:
@@ -32,18 +31,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Configure Docker to allow insecure registry
-        run: |
-          echo '{ "insecure-registries": ["registry.gitlab.euclid-sgs.uk"] }' \
-            | sudo tee /etc/docker/daemon.json
-          sudo systemctl restart docker
-
       - name: Login to GitLab Container Registry
-        run: |
-          echo "${{ secrets.TESTING }}" \
-            | docker login registry.gitlab.euclid-sgs.uk \
-                --username sjoudaki \
-                --password-stdin
+        uses: docker/login-action@v2
+        with:
+          registry: registry.gitlab.euclid-sgs.uk
+          username: testing
+          password: ${{ secrets.TESTING }}
 
       - name: Pull pre-built image
         run: |
@@ -57,15 +50,13 @@ jobs:
             -v "${{ github.workspace }}":/src \
             -w /src \
             "$IMAGE" \
-            bash -lc "\
-              pytest --verbose \
-                     --pycodestyle \
-                     --pydocstyle \
-                     --junitxml=pytest.xml \
-                     --cov=./ \
-                     --cov-report=term \
-                     --cov-report=xml=coverage.xml
-            "
+            bash -lc "pytest --verbose \
+                          --pycodestyle \
+                          --pydocstyle \
+                          --junitxml=pytest.xml \
+                          --cov=./ \
+                          --cov-report=term \
+                          --cov-report=xml=coverage.xml"
 
       - name: Upload JUnit report
         uses: actions/upload-artifact@v4
