@@ -1,40 +1,24 @@
-name: CI via Pre-built Docker Image
+name: CI via Docker Image
 
-# trigger on PRs against master and pushes to master
 on:
   pull_request:
-    branches:
-      - master
-    paths:
-      - 'cloe/**'
-      - 'configs/**'
-      - 'environment.yml'
-      - 'setup.cfg'
-      - '.github/workflows/ci.yml'
-      - 'setup.py'
+    branches: [ master ]
   push:
-    branches:
-      - master
-    paths:
-      - 'cloe/**'
-      - 'configs/**'
-      - 'environment.yml'
-      - 'setup.cfg'
-      - '.github/workflows/ci.yml'
-      - 'setup.py'
+    branches: [ master ]
   workflow_dispatch:
 
 jobs:
   tests:
     runs-on: ubuntu-latest
     env:
+      # ensure pytest colors, etc.
       PYTHONUNBUFFERED: 1
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Log in to GHCR
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
@@ -43,24 +27,21 @@ jobs:
 
       - name: Pull pre-built image
         run: |
-          IMAGE=ghcr.io/testarnyttnamn/testnamemaster:latest
-          echo "Pulling $IMAGE..."
-          docker pull "$IMAGE"
+          docker pull ghcr.io/testarnyttnamn/testnamemaster:latest
 
       - name: Run tests inside container
         run: |
-          IMAGE=ghcr.io/testarnyttnamn/testnamemaster:latest
           docker run --rm \
             -v "${{ github.workspace }}":/src \
             -w /src \
-            "$IMAGE" \
+            ghcr.io/testarnyttnamn/testnamemaster:latest \
             bash -lc "pytest --verbose \
-                        --pycodestyle \
-                        --pydocstyle \
-                        --junitxml=pytest.xml \
-                        --cov=./ \
-                        --cov-report=term \
-                        --cov-report=xml=coverage.xml"
+                               --pycodestyle \
+                               --pydocstyle \
+                               --junitxml=pytest.xml \
+                               --cov=./ \
+                               --cov-report=term \
+                               --cov-report=xml=coverage.xml"
 
       - name: Upload JUnit report
         uses: actions/upload-artifact@v4
