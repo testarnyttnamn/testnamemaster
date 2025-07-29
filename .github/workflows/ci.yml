@@ -2,7 +2,7 @@ name: CI via Pre-built Docker Image
 
 on:
   push:
-    branches: [ master, ci-debug ]
+    branches: [ master, codecov ]
     paths:
       - 'cloe/**'
       - 'configs/**'
@@ -11,7 +11,7 @@ on:
       - '.github/workflows/ci.yml'
       - 'setup.py'
   pull_request:
-    branches: [ master, ci-debug ]
+    branches: [ master, codecov ]
     paths:
       - 'cloe/**'
       - 'configs/**'
