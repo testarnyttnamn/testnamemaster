@@ -1,19 +1,23 @@
+# .github/workflows/build-and-push-image.yml
 name: Build & Push Docker Image
 
+# Fire on pushes to master *and* ci-debug (so you can test there)
 on:
   push:
-    branches: [ ci-debug ]
+    branches:
+      - master
+      - ci-debug
     paths:
       - 'Dockerfile'
       - 'environment.yml'
-      - 'setup.cfg'
-      - 'setup.py'
-      - 'cloe/**'
       - '.github/workflows/build-and-push-image.yml'
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read            # for checkout
+      packages: write           # to push to GHCR
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -23,11 +27,16 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_PAT }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push image
+      - name: Build & push image
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
-          tags: ghcr.io/testarnyttnamn/testnamemaster:latest
+          tags: |
+            ghcr.io/testarnyttnamn/testnamemaster:latest
+
+      # (optional) you could also tag by branch name:
+      #     tags: |
+      #       ghcr.io/testarnyttnamn/testnamemaster:ci-debug
