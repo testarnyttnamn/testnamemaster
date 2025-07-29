@@ -1,5 +1,6 @@
-name: CI Pipeline
+name: CI via Pre-built Docker Image
 
+# trigger on PRs against master and pushes to master
 on:
   pull_request:
     branches:
@@ -23,42 +24,43 @@ on:
       - 'setup.py'
   workflow_dispatch:
 
-env:
-  # disable PEP 517 isolation so that we pick up any local
-  # C/Fortran builds in-place while running pytest
-  PIP_NO_BUILD_ISOLATION: "1"
-
 jobs:
   tests:
-    name: 🧪 Run Tests
     runs-on: ubuntu-latest
+    env:
+      PYTHONUNBUFFERED: 1
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Miniconda
-        uses: conda-incubator/setup-miniconda@v2
+      - name: Log in to GHCR
+        uses: docker/login-action@v2
         with:
-          python-version: "3.9"
-          environment-file: environment.yml
-          activate-environment: cloe
-          auto-update-conda: false
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
 
-      - name: Confirm environment
+      - name: Pull pre-built image
         run: |
-          conda list
-          which python
+          IMAGE=ghcr.io/testarnyttnamn/testnamemaster:latest
+          echo "Pulling $IMAGE..."
+          docker pull "$IMAGE"
 
-      - name: Run pytest + coverage
+      - name: Run tests inside container
         run: |
-          python -m pytest \
-            --verbose \
-            --pycodestyle \
-            --pydocstyle \
-            --cov=./ \
-            --cov-report=term \
-            --cov-report=xml=coverage.xml \
-            --junitxml=pytest.xml
+          IMAGE=ghcr.io/testarnyttnamn/testnamemaster:latest
+          docker run --rm \
+            -v "${{ github.workspace }}":/src \
+            -w /src \
+            "$IMAGE" \
+            bash -lc "pytest --verbose \
+                        --pycodestyle \
+                        --pydocstyle \
+                        --junitxml=pytest.xml \
+                        --cov=./ \
+                        --cov-report=term \
+                        --cov-report=xml=coverage.xml"
 
       - name: Upload JUnit report
         uses: actions/upload-artifact@v4
@@ -71,113 +73,3 @@ jobs:
         with:
           name: coverage-report
           path: coverage.xml
-
-  docs_review:
-    name: 📚 Build Docs (PR)
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Miniconda & docs deps
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          python-version: "3.9"
-          environment-file: environment.yml
-          activate-environment: cloe
-          auto-update-conda: false
-
-      - name: Build Sphinx docs
-        run: |
-          mkdir -p docs/build
-          sphinx-apidoc --module-first -feo docs/source cloe
-          sphinx-build docs/source docs/build
-
-      - name: Upload HTML build
-        uses: actions/upload-artifact@v4
-        with:
-          name: html-build
-          path: docs/build
-
-  pages:
-    name: 🚀 Publish Docs (master)
-    runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'push' &&
-      github.ref == 'refs/heads/master'
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Miniconda & docs deps
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          python-version: "3.9"
-          environment-file: environment.yml
-          activate-environment: cloe
-          auto-update-conda: false
-
-      - name: Build Sphinx docs
-        run: |
-          mkdir -p docs/build
-          sphinx-apidoc --module-first -feo docs/source cloe
-          sphinx-build docs/source docs/build
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v5
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/build
-          publish_branch: gh-pages
-
-  verification:
-    name: ✅ Verification Suite
-    runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Miniconda & CLI deps
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          python-version: "3.9"
-          environment-file: environment.yml
-          activate-environment: cloe
-          auto-update-conda: false
-
-      - name: Run verification tests
-        run: |
-          export TF_CPP_MIN_LOG_LEVEL=1
-          python -m pytest cloe/tests/verification --junitxml=verification.xml
-
-      - name: Upload verification report
-        uses: actions/upload-artifact@v4
-        with:
-          name: verification-report
-          path: verification.xml
-
-  profiling:
-    name: 📊 Profiling
-    runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Miniconda & CLI deps
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          python-version: "3.9"
-          environment-file: environment.yml
-          activate-environment: cloe
-          auto-update-conda: false
-
-      - name: Run profiling
-        run: |
-          mkdir -p products
-          python -m cProfile -o products/evaluate_likelihood.pstats run_cloe.py configs/config_profiling_evaluate_likelihood.yaml
-          python -m cProfile -o products/mcmc.pstats run_cloe.py configs/config_profiling_mcmc.yaml
-
-      - name: Upload profiling artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: profiling-report
-          path: products/
