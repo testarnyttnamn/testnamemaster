@@ -1,5 +1,9 @@
-name: CI via Pre-built Docker Image
+name: CI Pipeline
 
+# Trigger on:
+#  - pushes to master (build+push + tests)
+#  - pushes to ci-debug (tests only)
+#  - any pull request (tests only)
 on:
   push:
     branches:
@@ -9,12 +13,45 @@ on:
   workflow_dispatch: {}
 
 env:
-  IMAGE_NAME: ghcr.io/testarnyttnamn/testnamemaster:latest   # ← your repo name
+  # ← change this to match YOUR org/repo
+  IMAGE_NAME: ghcr.io/testarnyttnamn/testnamemaster:latest
 
 jobs:
-  tests:
+  build-image:
+    # only build & push on push→master
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
+    outputs:
+      image: ${{ env.IMAGE_NAME }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
+
+      - name: Build Docker image
+        run: |
+          docker build --pull -t $IMAGE_NAME .
+
+      - name: Push Docker image
+        run: |
+          docker push $IMAGE_NAME
+
+  tests:
+    # run on PRs OR on push→master/ci-debug
+    if: |
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'push' && (
+         github.ref == 'refs/heads/master' ||
+         github.ref == 'refs/heads/ci-debug'
+      ))
+    runs-on: ubuntu-latest
+    needs: [build-image]   # build-image will be skipped on PR/ci-debug, but that's OK
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -27,7 +64,8 @@ jobs:
           password: ${{ secrets.GHCR_PAT }}
 
       - name: Pull pre-built image
-        run: docker pull $IMAGE_NAME
+        run: |
+          docker pull $IMAGE_NAME
 
       - name: Run pytest inside container
         run: |
