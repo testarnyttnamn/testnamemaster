@@ -1,89 +1,78 @@
-name: CI via Docker Image
+name: CI via Pre-built Docker Image
 
-# Trigger image build on pushes to main; run tests on PRs (and you can also
-# kick it manually with workflow_dispatch)
+# ——————————————————————————————————————————————
+# Trigger on master, ci-debug, PRs, and manual runs
+# ——————————————————————————————————————————————
 on:
   push:
     branches:
-      - main
+      - master
+      - ci-debug
     paths:
       - 'cloe/**'
       - 'configs/**'
       - 'environment.yml'
       - 'setup.cfg'
-      - '.github/workflows/ci-with-docker.yml'
+      - '.github/workflows/ci.yml'
       - 'setup.py'
   pull_request:
+    branches:
+      - master
+      - ci-debug
     paths:
       - 'cloe/**'
       - 'configs/**'
       - 'environment.yml'
       - 'setup.cfg'
-      - '.github/workflows/ci-with-docker.yml'
+      - '.github/workflows/ci.yml'
       - 'setup.py'
   workflow_dispatch:
 
-env:
-  IMAGE: ghcr.io/testarnyttnamn/likelihood-implementation:latest
-
 jobs:
-  build-image:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
-
-      - name: Build & push Docker image
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          push: true
-          tags: ${{ env.IMAGE }}
-          # cache-from / cache-to can speed up rebuilds if you like:
-          # cache-from: type=gha
-          # cache-to:   type=gha,mode=max
-
   tests:
-    needs: build-image
     runs-on: ubuntu-latest
     env:
       PYTHONUNBUFFERED: 1
+
     steps:
+      # 1) Checkout your code
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 2) Login to GHCR
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
+          password: ${{ secrets.CR_PAT }}
 
-      - name: Pull & run tests in container
+      # 3) Pull your image
+      - name: Pull pre-built image
         run: |
-          docker pull $IMAGE
+          IMAGE=ghcr.io/testarnyttnamn/likelihood-implementation:latest
+          docker pull "$IMAGE"
+
+      # 4) Run tests inside the container
+      - name: Run pytest inside container
+        run: |
+          IMAGE=ghcr.io/testarnyttnamn/likelihood-implementation:latest
           docker run --rm \
             -v "${{ github.workspace }}":/src \
             -w /src \
-            $IMAGE \
+            "$IMAGE" \
             bash -lc "pytest --verbose --pycodestyle --pydocstyle \
-                           --junitxml=pytest.xml \
-                           --cov=./ --cov-report=term --cov-report=xml=coverage.xml"
+                        --junitxml=pytest.xml \
+                        --cov=./ --cov-report=term --cov-report=xml=coverage.xml"
 
+      # 5) Upload JUnit report
       - name: Upload JUnit report
         uses: actions/upload-artifact@v4
         with:
           name: junit-report
           path: pytest.xml
 
+      # 6) Upload coverage report
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
