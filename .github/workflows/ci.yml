@@ -1,3 +1,4 @@
+# .github/workflows/ci.yml
 name: CI Pipeline
 
 on:
@@ -33,12 +34,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # ← NEW: system package for distutils
+      - name: Install Python build deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-distutils
+
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v2
         with:
           python-version: "3.9"
           environment-file: environment.yml
           activate-environment: cloe
+
+      # ← NEW: upgrade pip/backends before any pip builds
+      - name: Upgrade pip / setuptools / wheel
+        run: conda run -n cloe pip install --upgrade pip setuptools wheel
 
       - name: Confirm environment
         run: |
@@ -76,12 +87,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install Python build deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-distutils
+
       - name: Set up Miniconda & CLI deps
         uses: conda-incubator/setup-miniconda@v2
         with:
           python-version: "3.9"
           environment-file: environment.yml
           activate-environment: cloe
+
+      - name: Upgrade pip / setuptools / wheel
+        run: conda run -n cloe pip install --upgrade pip setuptools wheel
 
       - name: Run verification suite
         run: |
@@ -102,12 +121,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install Python build deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-distutils
+
       - name: Set up Miniconda & docs deps
         uses: conda-incubator/setup-miniconda@v2
         with:
           python-version: "3.9"
           environment-file: environment.yml
           activate-environment: cloe
+
+      - name: Upgrade pip / setuptools / wheel
+        run: conda run -n cloe pip install --upgrade pip setuptools wheel
 
       - name: Build Sphinx docs
         run: |
@@ -131,12 +158,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install Python build deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-distutils
+
       - name: Set up Miniconda & docs deps
         uses: conda-incubator/setup-miniconda@v2
         with:
           python-version: "3.9"
           environment-file: environment.yml
           activate-environment: cloe
+
+      - name: Upgrade pip / setuptools / wheel
+        run: conda run -n cloe pip install --upgrade pip setuptools wheel
 
       - name: Build Sphinx docs
         run: |
@@ -159,12 +194,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install Python build deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-distutils
+
       - name: Set up Miniconda & CLI deps
         uses: conda-incubator/setup-miniconda@v2
         with:
           python-version: "3.9"
           environment-file: environment.yml
           activate-environment: cloe
+
+      - name: Upgrade pip / setuptools / wheel
+        run: conda run -n cloe pip install --upgrade pip setuptools wheel
 
       - name: Run profiling
         run: |
