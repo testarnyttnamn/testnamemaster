@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - ci-debug
+      - master
     paths:
       - 'cloe/**'
       - 'configs/**'
@@ -14,6 +15,7 @@ on:
   push:
     branches:
       - ci-debug
+      - master
     paths:
       - 'cloe/**'
       - 'configs/**'
@@ -27,8 +29,8 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     permissions:
-      contents: read       # read your code
-      packages: read       # pull from GHCR
+      contents: read
+      packages: read
 
     steps:
       - name: Checkout code
@@ -43,7 +45,9 @@ jobs:
 
       - name: Pull & Run tests inside container
         run: |
-          IMAGE=ghcr.io/${{ github.repository_owner }}/testnamemaster:ci-debug
+          # use `latest` on master, `ci-debug` on ci-debug
+          TAG=${GITHUB_REF##*/}   # branch name
+          IMAGE=ghcr.io/${{ github.repository_owner }}/testnamemaster:${TAG == 'master' && echo latest || echo ci-debug}
           docker pull "$IMAGE"
           docker run --rm \
             -v "${{ github.workspace }}":/src \
