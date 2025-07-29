@@ -1,17 +1,17 @@
 name: Build & Push Docker Image
 
-# trigger on pushes to ci-debug (or master/main if you like)
 on:
   push:
     branches:
       - ci-debug
+      - master
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
-      contents: read        # to check out the code
-      packages: write       # to push to GHCR
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout code
@@ -32,9 +32,13 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/testnamemaster:ci-debug
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/testnamemaster:ci-debug
+            ghcr.io/${{ github.repository_owner }}/testnamemaster:latest
 
       - name: Confirm pushed
         run: |
-          echo "Image digest:"
-          docker run --rm ghcr.io/${{ github.repository_owner }}/testnamemaster:ci-debug sha256sum </dev/null || true
+          echo "ci-debug digest:"
+          docker manifest inspect ghcr.io/${{ github.repository_owner }}/testnamemaster:ci-debug
+          echo "latest digest:"
+          docker manifest inspect ghcr.io/${{ github.repository_owner }}/testnamemaster:latest
