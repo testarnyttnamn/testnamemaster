@@ -1,84 +1,64 @@
 name: CI Pipeline
 
-# Trigger on:
-#  - pushes to master (build+push + tests)
-#  - pushes to ci-debug (tests only)
-#  - any pull request (tests only)
 on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'cloe/**'
+      - 'configs/**'
+      - 'environment.yml'
+      - 'setup.cfg'
+      - '.github/workflows/ci.yml'
+      - 'setup.py'
   push:
     branches:
       - master
-      - ci-debug
-  pull_request: {}
-  workflow_dispatch: {}
+    paths:
+      - 'cloe/**'
+      - 'configs/**'
+      - 'environment.yml'
+      - 'setup.cfg'
+      - '.github/workflows/ci.yml'
+      - 'setup.py'
+  workflow_dispatch:
 
 env:
-  # ← change this to match YOUR org/repo
-  IMAGE_NAME: ghcr.io/testarnyttnamn/testnamemaster:latest
+  # disable PEP 517 isolation so that we pick up any local
+  # C/Fortran builds in-place while running pytest
+  PIP_NO_BUILD_ISOLATION: "1"
 
 jobs:
-  build-image:
-    # only build & push on push→master
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    outputs:
-      image: ${{ env.IMAGE_NAME }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_PAT }}
-
-      - name: Build Docker image
-        run: |
-          docker build --pull -t $IMAGE_NAME .
-
-      - name: Push Docker image
-        run: |
-          docker push $IMAGE_NAME
-
   tests:
-    # run on PRs OR on push→master/ci-debug
-    if: |
-      github.event_name == 'pull_request' ||
-      (github.event_name == 'push' && (
-         github.ref == 'refs/heads/master' ||
-         github.ref == 'refs/heads/ci-debug'
-      ))
+    name: 🧪 Run Tests
     runs-on: ubuntu-latest
-    needs: [build-image]   # build-image will be skipped on PR/ci-debug, but that's OK
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_PAT }}
+          python-version: "3.9"
+          environment-file: environment.yml
+          activate-environment: cloe
+          auto-update-conda: false
 
-      - name: Pull pre-built image
+      - name: Confirm environment
         run: |
-          docker pull $IMAGE_NAME
+          conda list
+          which python
 
-      - name: Run pytest inside container
+      - name: Run pytest + coverage
         run: |
-          docker run --rm \
-            -v "${{ github.workspace }}":/src \
-            -w /src \
-            $IMAGE_NAME \
-            bash -lc "pytest --verbose \
-                          --pycodestyle \
-                          --pydocstyle \
-                          --junitxml=pytest.xml \
-                          --cov=./ \
-                          --cov-report=xml=coverage.xml"
+          python -m pytest \
+            --verbose \
+            --pycodestyle \
+            --pydocstyle \
+            --cov=./ \
+            --cov-report=term \
+            --cov-report=xml=coverage.xml \
+            --junitxml=pytest.xml
 
       - name: Upload JUnit report
         uses: actions/upload-artifact@v4
@@ -91,3 +71,113 @@ jobs:
         with:
           name: coverage-report
           path: coverage.xml
+
+  docs_review:
+    name: 📚 Build Docs (PR)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Miniconda & docs deps
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: "3.9"
+          environment-file: environment.yml
+          activate-environment: cloe
+          auto-update-conda: false
+
+      - name: Build Sphinx docs
+        run: |
+          mkdir -p docs/build
+          sphinx-apidoc --module-first -feo docs/source cloe
+          sphinx-build docs/source docs/build
+
+      - name: Upload HTML build
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-build
+          path: docs/build
+
+  pages:
+    name: 🚀 Publish Docs (master)
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Miniconda & docs deps
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: "3.9"
+          environment-file: environment.yml
+          activate-environment: cloe
+          auto-update-conda: false
+
+      - name: Build Sphinx docs
+        run: |
+          mkdir -p docs/build
+          sphinx-apidoc --module-first -feo docs/source cloe
+          sphinx-build docs/source docs/build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v5
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/build
+          publish_branch: gh-pages
+
+  verification:
+    name: ✅ Verification Suite
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Miniconda & CLI deps
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: "3.9"
+          environment-file: environment.yml
+          activate-environment: cloe
+          auto-update-conda: false
+
+      - name: Run verification tests
+        run: |
+          export TF_CPP_MIN_LOG_LEVEL=1
+          python -m pytest cloe/tests/verification --junitxml=verification.xml
+
+      - name: Upload verification report
+        uses: actions/upload-artifact@v4
+        with:
+          name: verification-report
+          path: verification.xml
+
+  profiling:
+    name: 📊 Profiling
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Miniconda & CLI deps
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: "3.9"
+          environment-file: environment.yml
+          activate-environment: cloe
+          auto-update-conda: false
+
+      - name: Run profiling
+        run: |
+          mkdir -p products
+          python -m cProfile -o products/evaluate_likelihood.pstats run_cloe.py configs/config_profiling_evaluate_likelihood.yaml
+          python -m cProfile -o products/mcmc.pstats run_cloe.py configs/config_profiling_mcmc.yaml
+
+      - name: Upload profiling artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: profiling-report
+          path: products/
