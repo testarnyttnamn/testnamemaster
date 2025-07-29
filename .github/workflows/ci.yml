@@ -32,23 +32,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Login to GitLab Container Registry (insecure)
+      - name: Configure Docker to allow insecure registry
+        run: |
+          echo '{ "insecure-registries": ["registry.gitlab.euclid-sgs.uk"] }' \
+            | sudo tee /etc/docker/daemon.json
+          sudo systemctl restart docker
+
+      - name: Login to GitLab Container Registry
         run: |
           echo "${{ secrets.TESTING }}" \
             | docker login registry.gitlab.euclid-sgs.uk \
                 --username sjoudaki \
-                --password-stdin \
-                --tls-verify=false
+                --password-stdin
 
-      - name: Pull pre-built image (insecure)
+      - name: Pull pre-built image
         run: |
           IMAGE=registry.gitlab.euclid-sgs.uk/pf-ist-likelihood/likelihood-implementation:latest
-          docker --tls-verify=false pull "$IMAGE"
+          docker pull "$IMAGE"
 
       - name: Run tests inside container
         run: |
           IMAGE=registry.gitlab.euclid-sgs.uk/pf-ist-likelihood/likelihood-implementation:latest
-          docker --tls-verify=false run --rm \
+          docker run --rm \
             -v "${{ github.workspace }}":/src \
             -w /src \
             "$IMAGE" \
