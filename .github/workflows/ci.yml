@@ -25,8 +25,6 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     env:
-      # use head_ref on PRs, "latest" on master, else branch name
-      IMAGE_TAG: ${{ github.event_name == 'pull_request' && github.head_ref || (github.ref == 'refs/heads/master' && 'latest' || github.ref_name) }}
       PYTHONUNBUFFERED: 1
 
     steps:
@@ -42,7 +40,7 @@ jobs:
 
       - name: Pull image & run tests
         run: |
-          IMAGE=ghcr.io/testarnyttnamn/testnamemaster:${IMAGE_TAG}
+          IMAGE=ghcr.io/testarnyttnamn/testnamemaster:latest
           echo "→ Pulling $IMAGE"
           docker pull "$IMAGE"
 
