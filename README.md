@@ -3,7 +3,7 @@
 
 # CLOE: Cosmology Likelihood for Observables in Euclid
 
-<img src="./docs/other/cloelogo_notext.png" alt="Logo" width="380" />
+<img src="./docs/other/cloelogo_notext.png" alt="Logo" width="350" />
 
 This repository allows the user to obtain model predictions and cosmological parameter constraints for synthetic and real Euclid data. It is developed by members of the Euclid Consortium.
 
