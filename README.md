@@ -1,6 +1,5 @@
 [![CI](https://github.com/testarnyttnamn/testnamemaster/actions/workflows/ci.yml/badge.svg)](https://github.com/testarnyttnamn/testnamemaster/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/testarnyttnamn/testnamemaster/branch/master/graph/badge.svg)](https://codecov.io/gh/testarnyttnamn/testnamemaster)
-# [![Coverage Status](https://coveralls.io/repos/github/testarnyttnamn/testnamemaster/badge.svg?branch=master)](https://coveralls.io/github/testarnyttnamn/testnamemaster?branch=master)
 
 # CLOE: Cosmology Likelihood for Observables in Euclid
 
