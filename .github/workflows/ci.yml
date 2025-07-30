@@ -25,6 +25,7 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     env:
+      IMAGE_TAG: latest
       PYTHONUNBUFFERED: 1
 
     steps:
