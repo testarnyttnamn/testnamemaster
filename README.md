@@ -1,6 +1,6 @@
 # CLOE: Cosmology Likelihood for Observables in Euclid
 
-<img src="./docs/other/cloelogo_notext.png" alt="Logo" width="320" />
+<img src="./docs/other/cloelogo_notext.png" alt="Logo" width="300" />
 
 [![CI](https://github.com/testarnyttnamn/testnamemaster/actions/workflows/ci.yml/badge.svg)](https://github.com/testarnyttnamn/testnamemaster/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/testarnyttnamn/testnamemaster/branch/master/graph/badge.svg)](https://codecov.io/gh/testarnyttnamn/testnamemaster)
