@@ -1,25 +1,23 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# Sphinx itself
+# Sphinx and theme
 sphinx==7.3.7
-sphinx‑rtd‑theme==3.0.2
+sphinx-rtd-theme==3.0.2
 numpydoc==1.6.0
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Core scientific dependencies (used throughout cloe)
+# Core scientific dependencies
 numpy==1.23.5
 scipy==1.10.1
 matplotlib==3.7.1
 astropy==5.3
-PyYAML>=6.0               # for your YAML handlers
+PyYAML>=6.0
 mpi4py==3.1.4
 fast-pt==3.1.1
 camb==1.5.0
-fitsio                    # if you import fitsio anywhere
-# (PyQt is only needed if you actually do GUI autodoc; skip if you don’t import it)
-# pyqt                    
+fitsio
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Domain‑specific Python packages (your “pip:” section from environment.yml)
+# Your pip‑only packages
 cobaya==3.3.1
 deepdish==0.3.7
 git+https://bitbucket.org/rangulo/baccoemu.git@7e0ca8b
@@ -29,7 +27,7 @@ pyhmcode==1.0.0
 euclidlib==0.0.5
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Packages pulled in by your tests (only if you’re autodoc’ing them, too)
+# If you really want to autodoc your tests, pull in these too
 cosmosis
 cosmosis-build-standard-library
 pytest-pydocstyle==2.3.2
