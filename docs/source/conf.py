@@ -54,7 +54,13 @@ autoclass_content = 'both'
 autodoc_member_order = 'bysource'
 
 # Include private class methods
-autodoc_default_flags = ['members', 'private-members']
+# autodoc_default_flags = ['members', 'private-members']
+autodoc_default_options = {
+    'members'       : True,
+    'private-members': True,
+    'undoc-members' : True,
+    'show-inheritance': True,
+}
 
 # Suppress class members in toctree.
 numpydoc_show_class_members = False
