@@ -1,7 +1,7 @@
 Cosmology Likelihood for Observables in Euclid
 ==============================================
 
-.. image:: ../other/cloelogo.pdf
+.. image:: ../other/cloelogo.png
   :width: 320
   :alt: Logo
 
