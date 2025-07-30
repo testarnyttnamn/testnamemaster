@@ -1,10 +1,11 @@
-[![codecov](https://codecov.io/gh/testarnyttnamn/testnamemaster/branch/master/graph/badge.svg)](https://codecov.io/gh/testarnyttnamn/testnamemaster)
+# CLOE: Cosmology Likelihood for Observables in *Euclid*
+
+<img src="./docs/other/cloelogo_notext.png" alt="Logo" width="300" />
+
 [![CI](https://github.com/testarnyttnamn/testnamemaster/actions/workflows/ci.yml/badge.svg)](https://github.com/testarnyttnamn/testnamemaster/actions/workflows/ci.yml)
-[![Coverage Status](https://coveralls.io/repos/github/testarnyttnamn/testnamemaster/badge.svg?branch=master)](https://coveralls.io/github/testarnyttnamn/testnamemaster?branch=master)
-
-# CLOE: Cosmology Likelihood for Observables in Euclid
-
-<img src="./docs/other/cloelogo_notext.png" alt="Logo" width="380" />
+[![codecov](https://codecov.io/gh/testarnyttnamn/testnamemaster/branch/master/graph/badge.svg)](https://codecov.io/gh/testarnyttnamn/testnamemaster)
+[![License: LGPL-3.0](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0.en.html)
+[![Documentation](https://readthedocs.org/projects/testnamemaster/badge/?version=latest)](https://testnamemaster.readthedocs.io/en/latest/)
 
 This repository allows the user to obtain model predictions and cosmological parameter constraints for synthetic and real Euclid data. It is developed by members of the Euclid Consortium.
 
@@ -240,7 +241,7 @@ These example scripts accomplish exactly the same commands as the `run_cloe.py` 
 *  ```example_mcmc_script_for_cluster.sh```: example shell script for submitting jobs on a computing cluster
 *  ```run_cloe.py```: top level script for running the CLOE user interface
 *  ```setup.py```: top level script for installing or testing CLOE
-*  ```LICENCE.txt```: file containing the LGPL license of CLOE
+*  ```LICENSE```: file containing the LGPL license of CLOE
 
 
 ## Unit and verification tests
