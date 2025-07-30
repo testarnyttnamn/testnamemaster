@@ -77,3 +77,13 @@ jobs:
           files: coverage.xml
           # if your repo is private, you’ll need a token here:
           # token: ${{ secrets.CODECOV_TOKEN }}
+
+                # ← Insert the Codecov step here ↓
+
+      - name: Send coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.xml
+          flags: unittests
+          fail_ci_if_error: true
