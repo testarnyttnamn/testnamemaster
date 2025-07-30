@@ -38,7 +38,7 @@ cross-correlations of galaxy positions and shapes with the cosmic microwave back
    :maxdepth: 4
    :caption: Reference
 
-   api/cloe
+   API Documentation<api/cloe>
    cite_us
    changelog
    contributing
