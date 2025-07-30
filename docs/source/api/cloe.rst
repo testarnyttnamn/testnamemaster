@@ -1,5 +1,5 @@
-cloe package
-============
+API Documentation
+=================
 
 .. automodule:: cloe
    :members:
