@@ -57,7 +57,8 @@ jobs:
                               --junitxml=pytest.xml \
                               --cov=./ \
                               --cov-report=term \
-                              --cov-report=xml:coverage.xml"
+                              --cov-report=xml:coverage.xml \
+                              --cov-report=lcov:coverage.lcov"
 
       - name: Upload JUnit report
         uses: actions/upload-artifact@v4
@@ -65,25 +66,25 @@ jobs:
           name: junit-report
           path: pytest.xml
 
-      - name: Upload coverage report
+      - name: Upload coverage reports
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
-          path: coverage.xml
-
-      - name: Upload to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          files: coverage.xml
-          # if your repo is private, you’ll need a token here:
-          # token: ${{ secrets.CODECOV_TOKEN }}
-
-                # ← Insert the Codecov step here ↓
+          name: coverage-reports
+          path: |
+            coverage.xml
+            coverage.lcov
 
       - name: Send coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.xml
-          flags: unittests
+          token: ${{ secrets.CODECOV_TOKEN }}    # only needed if your repo is private
           fail_ci_if_error: true
+
+      - name: Send coverage to Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          path-to-lcov: coverage.lcov
+          repo-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel: true
