@@ -1,4 +1,5 @@
-[![codecov](https://codecov.io/gh/testarnyttnamn/testnamemaster/branch/main/graph/badge.svg)](https://codecov.io/gh/testarnyttnamn/testnamemaster)
+[![codecov](https://codecov.io/gh/testarnyttnamn/testnamemaster/branch/master/graph/badge.svg)](https://codecov.io/gh/testarnyttnamn/testnamemaster)
+[![CI](https://github.com/testarnyttnamn/testnamemaster/actions/workflows/ci.yml/badge.svg)](https://github.com/testarnyttnamn/testnamemaster/actions/workflows/ci.yml)
 
 # CLOE: Cosmology Likelihood for Observables in Euclid
 

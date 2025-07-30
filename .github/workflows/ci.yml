@@ -1,4 +1,4 @@
-name: CI via Pre-built Docker Image
+name: Continuous Integration
 
 on:
   push:
@@ -25,6 +25,7 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     env:
+      IMAGE_TAG: latest
       PYTHONUNBUFFERED: 1
 
     steps:
@@ -69,3 +70,10 @@ jobs:
         with:
           name: coverage-report
           path: coverage.xml
+
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: coverage.xml
+          # if your repo is private, you’ll need a token here:
+          # token: ${{ secrets.CODECOV_TOKEN }}
