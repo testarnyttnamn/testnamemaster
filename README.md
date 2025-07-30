@@ -34,7 +34,7 @@ In order to obtain cosmological parameter constraints, CLOE reads in the redshif
 **git clone CLOE**
 
 ```shell
-git clone https://gitlab.euclid-sgs.uk/pf-ist-likelihood/likelihood-implementation.git
+git clone https://github.com/testarnyttnamn/testnamemaster.git
 ```
 We provide below different options for installation: [with conda](#conda), or [with pip](#pip), or [with docker](#docker). In the [troubleshooting](#troubles) section you can find a list of  suggestions to solve issues that we encountered so far, which may help you with the installation.
 
