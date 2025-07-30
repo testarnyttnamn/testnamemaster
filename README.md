@@ -241,7 +241,7 @@ These example scripts accomplish exactly the same commands as the `run_cloe.py` 
 *  ```example_mcmc_script_for_cluster.sh```: example shell script for submitting jobs on a computing cluster
 *  ```run_cloe.py```: top level script for running the CLOE user interface
 *  ```setup.py```: top level script for installing or testing CLOE
-*  ```LICENCE.txt```: file containing the LGPL license of CLOE
+*  ```LICENSE```: file containing the LGPL license of CLOE
 
 
 ## Unit and verification tests
