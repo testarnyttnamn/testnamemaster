@@ -35,7 +35,7 @@ cross-correlations of galaxy positions and shapes with the cosmic microwave back
    example
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 1
    :caption: Reference
 
    API Documentation<api/cloe>
