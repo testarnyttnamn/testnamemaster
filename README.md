@@ -1,4 +1,4 @@
-# CLOE: Cosmology Likelihood for Observables in Euclid
+# CLOE: Cosmology Likelihood for Observables in *Euclid*
 
 <img src="./docs/other/cloelogo_notext.png" alt="Logo" width="300" />
 
