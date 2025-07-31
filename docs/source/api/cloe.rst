@@ -6,8 +6,4 @@ cloe API reference
    :recursive:
 
    cloe
-
-.. toctree::
-   :maxdepth: 2
-
-   api/cosmosis
+   cosmosis
