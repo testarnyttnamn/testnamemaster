@@ -14,6 +14,15 @@
 
 import sys
 import os
+import numpydoc.numpydoc as _numpydoc_module
+
+# patch numpydoc to avoid TypeError when signature is not a string
+_original_clean = _numpydoc_module._clean_text_signature
+def _safe_clean_text_signature(sig):
+    if not isinstance(sig, str):
+        return ''
+    return _original_clean(sig)
+_numpydoc_module._clean_text_signature = _safe_clean_text_signature
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -65,6 +74,7 @@ autodoc_mock_imports = [
     "pandas",
     "seaborn",
     "tensorflow",
+    "cosmosis",
     "cosmosis.datablock",
     "cosmosis.cosmosis_interface",
     "cosmosis.cosmosis_with_cobaya_interface",
