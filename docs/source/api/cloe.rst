@@ -2,7 +2,7 @@ cloe API reference
 ==================
 
 .. autosummary::
-   :toctree: .
+   :toctree: cloe
    :recursive:
 
    cloe
