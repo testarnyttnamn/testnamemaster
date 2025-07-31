@@ -9,7 +9,23 @@ implemented in CLOE.
 
 """
 
-__all__ = []  # list submodules
+__all__ = [
+    "auxiliary",
+    "clusters_of_galaxies",
+    "cmbx_p",
+    "cobaya_interface",
+    "cosmo",
+    "data_reader",
+    "fftlog",
+    "info",
+    "like_calc",
+    "masking",
+    "non_linear",
+    "photometric_survey",
+    "spectroscopic_survey",
+    "tests",
+    "user_interface",
+]
 
 from cloe import *
 from cloe.info import __version__

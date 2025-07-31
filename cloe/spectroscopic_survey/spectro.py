@@ -2,7 +2,7 @@
 SPECTRO
 
 This module computes the spectroscopic quantities following the
-v2.0 recipes of CLOE.
+theoretical recipe of CLOE.
 """
 
 # Global
