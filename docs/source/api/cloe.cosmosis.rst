@@ -5,3 +5,5 @@ cloe.cosmosis module
    :members:
    :undoc-members:
    :inherited-members:
+
+   cosmosis
