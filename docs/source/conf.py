@@ -63,6 +63,8 @@ autodoc_mock_imports = [
     "camb",
     "fitsio",
     "pandas",
+    "seaborn",
+    "tensorflow",
 ]
 
 # Make sure the target is unique
