@@ -62,6 +62,7 @@ autodoc_mock_imports = [
     "mpi4py",
     "camb",
     "fitsio",
+    "pandas",
 ]
 
 # Make sure the target is unique
