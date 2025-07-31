@@ -1,8 +1,8 @@
-cloe
-====
+cosmosis
+========
 
 .. autosummary::
    :toctree: .
    :recursive:
 
-   cloe
+   cosmosis
