@@ -1,11 +1,6 @@
 cloe package
 ============
 
-CLOE package
-
-Modules
--------
-
 .. autosummary::
    :toctree: cloe
    :maxdepth: 1
@@ -15,7 +10,6 @@ Modules
    cloe.cmbx_p
    cloe.cobaya_interface
    cloe.cosmo
-   cloe.cosmosis
    cloe.data_reader
    cloe.fftlog
    cloe.info
@@ -26,3 +20,11 @@ Modules
    cloe.spectroscopic_survey
    cloe.tests
    cloe.user_interface
+
+cloe package: cosmosis integration
+==================================
+
+.. toctree::
+   :maxdepth: 1
+
+   cosmosis
