@@ -55,6 +55,7 @@ autodoc_mock_imports = [
     "astropy",
     "yaml",
     "euclidlib",
+    "getdist",
 ]
 
 # Make sure the target is unique
