@@ -6,4 +6,3 @@ cloe API reference
    :recursive:
 
    cloe
-   cosmosis
