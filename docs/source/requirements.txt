@@ -5,30 +5,27 @@ sphinx-rtd-theme==3.0.2
 numpydoc==1.6.0
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Core scientific dependencies
+# Core numerical libraries (needed to import your modules)
 numpy==1.23.5
 scipy==1.10.1
 matplotlib==3.7.1
 astropy==5.3
 PyYAML>=6.0
+
+# ─────────────────────────────────────────────────────────────────────────────
+# MPI support (pick the last 3.x line that matches Python 3.9)
 mpi4py==3.1.4
-fast-pt==3.1.1
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Your domain‐specific libraries
 camb==1.5.0
-fitsio
+fitsio>=1.1.4
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Your pip‑only packages
+# fast‑pt: pick a real release!
+fast-pt==3.1.2
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Additional back‐ends & users of your code
 cobaya==3.3.1
-deepdish==0.3.7
-git+https://bitbucket.org/rangulo/baccoemu.git@7e0ca8b
-BCemu==1.1
-euclidemu2==1.2.1
-pyhmcode==1.0.0
-euclidlib==0.0.5
 
-# ─────────────────────────────────────────────────────────────────────────────
-# If you really want to autodoc your tests, pull in these too
-cosmosis
-cosmosis-build-standard-library
-pytest-pydocstyle==2.3.2
-qtvscodestyle
