@@ -1,31 +1,11 @@
-# ─────────────────────────────────────────────────────────────────────────────
 # Sphinx and theme
 sphinx==7.3.7
 sphinx-rtd-theme==3.0.2
 numpydoc==1.6.0
 
-# ─────────────────────────────────────────────────────────────────────────────
 # Core numerical libraries (needed to import your modules)
 numpy==1.23.5
 scipy==1.10.1
 matplotlib==3.7.1
-astropy==5.3
+astropy==5.4
 PyYAML>=6.0
-
-# ─────────────────────────────────────────────────────────────────────────────
-# MPI support (pick the last 3.x line that matches Python 3.9)
-mpi4py==3.1.4
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Your domain‐specific libraries
-camb==1.5.0
-fitsio>=1.1.4
-
-# ─────────────────────────────────────────────────────────────────────────────
-# fast‑pt: pick a real release!
-fast-pt==3.1.2
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Additional back‐ends & users of your code
-cobaya==3.3.1
-
