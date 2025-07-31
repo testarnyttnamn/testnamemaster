@@ -56,6 +56,7 @@ autodoc_mock_imports = [
     "yaml",
     "euclidlib",
     "getdist",
+    "fastpt",
 ]
 
 # Make sure the target is unique
