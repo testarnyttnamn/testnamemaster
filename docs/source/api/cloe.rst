@@ -3,7 +3,7 @@ cloe package
 
 .. autosummary::
    :toctree: cloe
-   :maxdepth: 1
+   :recursive:
 
    cloe.auxiliary
    cloe.clusters_of_galaxies
@@ -27,4 +27,4 @@ cloe package: cosmosis integration
 .. toctree::
    :maxdepth: 1
 
-   cosmosis
+   cloe/cosmosis
