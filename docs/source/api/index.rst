@@ -1,8 +1,7 @@
-cloe API reference
-==================
+API Documentation
+=================
 
-.. autosummary::
-   :toctree: cloe
-   :recursive:
+.. toctree::
+   :maxdepth: 1
 
    cloe
