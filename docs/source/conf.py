@@ -54,6 +54,7 @@ autodoc_mock_imports = [
     "scipy",
     "astropy",
     "yaml",
+    "euclidlib",
 ]
 
 # Make sure the target is unique
