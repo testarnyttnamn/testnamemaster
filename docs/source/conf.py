@@ -44,6 +44,18 @@ extensions = [
     'numpydoc'
 ]
 
+autosummary_generate = True
+autosummary_imported_members = True
+
+# mock imports
+autodoc_mock_imports = [
+    "matplotlib",
+    "numpy",
+    "scipy",
+    "astropy",
+    "yaml",
+]
+
 # Make sure the target is unique
 autosectionlabel_prefix_document = True
 
@@ -59,6 +71,7 @@ autodoc_default_options = {
     'members'       : True,
     'private-members': True,
     'undoc-members' : True,
+    'inherited-members' : True,
     'show-inheritance': True,
 }
 
