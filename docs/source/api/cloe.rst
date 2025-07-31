@@ -6,4 +6,4 @@ cloe API reference
    :recursive:
 
    cloe
-   cosmosis
+   cloe.cosmosis
