@@ -58,6 +58,10 @@ autodoc_mock_imports = [
     "getdist",
     "fastpt",
     "pyhmcode",
+    "cobaya",
+    "mpi4py",
+    "camb",
+    "fitsio",
 ]
 
 # Make sure the target is unique
