@@ -1,11 +1,7 @@
-# Sphinx and theme
-sphinx==7.3.7
-sphinx-rtd-theme==3.0.2
-numpydoc==1.6.0
-
-# Core numerical libraries (needed to import your modules)
-numpy==1.23.5
-scipy==1.10.1
-matplotlib==3.7.1
-astropy==5.4
-PyYAML>=6.0
+sphinx
+sphinx_mdinclude
+numpy
+scipy
+docutils
+sphinx_rtd_theme
+numpydoc
