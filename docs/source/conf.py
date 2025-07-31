@@ -65,6 +65,10 @@ autodoc_mock_imports = [
     "pandas",
     "seaborn",
     "tensorflow",
+    "cosmosis.datablock",
+    "cosmosis.cosmosis_interface",
+    "cosmosis.cosmosis_with_cobaya_interface",
+    "cosmosis.camb_interface",
 ]
 
 # Make sure the target is unique
