@@ -1,8 +1,8 @@
-Cosmosis integration
+cosmosis integration
 ====================
 
 .. autosummary::
-   :toctree: generated/cosmosis
+   :toctree: cosmosis
    :recursive:
 
    cosmosis.cosmosis_interface
