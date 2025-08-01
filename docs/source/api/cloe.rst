@@ -21,5 +21,7 @@ cloe package
    cloe.tests
    cloe.user_interface
 
-See also: :doc:`cosmosis integration <cosmosis_integration>`
+.. toctree::
+   :maxdepth: 1
 
+   cosmosis_integration
