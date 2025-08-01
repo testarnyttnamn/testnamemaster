@@ -1,10 +1,28 @@
-cosmosis integration
+CosmoSIS Integration
 ====================
 
 .. autosummary::
-   :toctree: cosmosis_integration
-   :maxdepth: 2
+   :toctree: _autosummaries
+   :nosignatures:
 
-   cosmosis.cosmosis_interface
-   cosmosis.cosmosis_with_cobaya_interface
-   cosmosis.camb_interface
+   cloe.cosmosis_integration.cosmosis_interface.CosmosisInterface
+   cloe.cosmosis_integration.cosmosis_with_cobaya_interface.CosmosisWithCobayaInterface
+   cloe.cosmosis_integration.camb_interface.CambInterface
+
+.. autoclass:: cloe.cosmosis_integration.cosmosis_interface.CosmosisInterface
+   :members:
+   :undoc-members:
+   :inherited-members:
+   :show-inheritance:
+
+.. autoclass:: cloe.cosmosis_integration.cosmosis_with_cobaya_interface.CosmosisWithCobayaInterface
+   :members:
+   :undoc-members:
+   :inherited-members:
+   :show-inheritance:
+
+.. autoclass:: cloe.cosmosis_integration.camb_interface.CambInterface
+   :members:
+   :undoc-members:
+   :inherited-members:
+   :show-inheritance:
