@@ -20,5 +20,6 @@ cloe package
    cloe.spectroscopic_survey
    cloe.tests
    cloe.user_interface
-   cosmosis_integration
+
+See also: :doc:`cosmosis integration <cosmosis_integration>`
 
