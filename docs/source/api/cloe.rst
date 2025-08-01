@@ -21,25 +21,9 @@ cloe package
    cloe.tests
    cloe.user_interface
 
-cloe package: cosmosis integration
-----------------------------------
+See also: :doc:`Cosmosis integration <cosmosis_integration>`
 
-This section documents how CLOE integrates with Cosmosis...
+.. toctree::
+   :maxdepth: 1
 
-.. automodule:: cosmosis.cosmosis_interface
-   :members:
-   :undoc-members:
-   :inherited-members:
-   :show-inheritance:
-
-.. automodule:: cosmosis.cosmosis_with_cobaya_interface
-   :members:
-   :undoc-members:
-   :inherited-members:
-   :show-inheritance:
-
-.. automodule:: cosmosis.camb_interface
-   :members:
-   :undoc-members:
-   :inherited-members:
-   :show-inheritance:
+   cosmosis_integration
