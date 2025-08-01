@@ -5,23 +5,23 @@ cosmosis integration
    :toctree: cosmosis_integration
    :recursive:
 
-   cloe.cosmosis_integration.cosmosis_interface
-   cloe.cosmosis_integration.cosmosis_with_cobaya_interface
-   cloe.cosmosis_integration.camb_interface
+   cosmosis.cosmosis_interface
+   cosmosis.cosmosis_with_cobaya_interface
+   cosmosis.camb_interface
 
-.. autoclass:: cloe.cosmosis_integration.cosmosis_interface.CosmosisInterface
+.. autoclass:: cosmosis.cosmosis_interface.CosmosisInterface
    :members:
    :undoc-members:
    :inherited-members:
    :show-inheritance:
 
-.. autoclass:: cloe.cosmosis_integration.cosmosis_with_cobaya_interface.CosmosisWithCobayaInterface
+.. autoclass:: cosmosis.cosmosis_with_cobaya_interface.CosmosisWithCobayaInterface
    :members:
    :undoc-members:
    :inherited-members:
    :show-inheritance:
 
-.. autoclass:: cloe.cosmosis_integration.camb_interface.CambInterface
+.. autoclass:: cosmosis.camb_interface.CambInterface
    :members:
    :undoc-members:
    :inherited-members:
