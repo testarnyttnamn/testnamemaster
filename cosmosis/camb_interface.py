@@ -61,6 +61,26 @@ def get_optional_params(block, section, names):
     return params
 
 def get_choice(options, name, valid, default=None, prefix=''):
+    r"""Setup and initialize CLOE likelihood,
+    based on the config yaml file and user input
+    from the CosmoSIS ini file.
+
+    Parameters
+    ----------
+    options: CosmoSIS datablock
+        options read in from the CosmoSIS ini file
+
+    Returns
+    -------
+    likefinal: Class
+        The initialized Euclike class
+    cloe_cosmo: dict
+        Dictionary of the cosmological quantities as required
+        by the Euclike class
+    fid_cosmo: dict
+        Dictionary of the fiducial cosmological quantities
+        when Euclike class is initialised
+    """
     choice = options.get_string(opt, name, default=default)
     if choice not in valid:
         raise ValueError("Parameter setting '{}' in camb must be one of: {}.  You tried: {}".format(name, valid, choice))
