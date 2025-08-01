@@ -5,4 +5,3 @@ API Documentation
    :maxdepth: 2
 
    cloe
-   cosmosis_integration
