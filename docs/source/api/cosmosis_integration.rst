@@ -21,8 +21,15 @@ cosmosis integration
    :inherited-members:
    :show-inheritance:
 
-.. autoclass:: cosmosis.camb_interface.CambInterface
+.. autoclass:: cosmosis.camb_interface.get_optional_params
    :members:
    :undoc-members:
    :inherited-members:
    :show-inheritance:
+
+.. autoclass:: cosmosis.camb_interface.get_choice
+   :members:
+   :undoc-members:
+   :inherited-members:
+   :show-inheritance:
+
