@@ -229,21 +229,23 @@ These example scripts accomplish exactly the same commands as the `run_cloe.py` 
 
 ## Structure of the repository
 *  **cloe**: folder containing the CLOE source code and unit tests in Python (see the [API documentation](http://pf-ist-likelihood.pages.euclid-sgs.uk/likelihood-implementation/index.html) for details)
-*  **configs**: folder containing configuration files in YAML, which allow the user to choose analysis settings such as the cosmological probes, summary statistics, scale cuts, parameter space, and systematic uncertainties. 
 *  **cosmosis**: folder containing the CLOE source code in Python and configuration files in INI for its CosmoSIS interface
+*  **configs**: folder containing configuration files in YAML, which allow the user to choose analysis settings such as the cosmological probes, summary statistics, scale cuts, parameter space, and systematic uncertainties. 
 *  **data**: folder containing the data products (be it real or synthetic)
 *  **docs**: folder containing automatically generated documentation
-*  **example**: folder containing example YAML configuration files
 *  **gui**: folder containing the graphical user interface
+*  **example**: folder containing example YAML configuration files
 *  **mcmc scripts**: folder containing example Python scripts to run MCMC chains for different combinations of probes, cosmological parameters, and treatments of systematic uncertainties
 *  **notebooks**: folder containing demonstration and validation Jupyter Notebooks
 *  **scripts**: folder containing example Python scripts to simulate data
 *  ```environment.yml```: file specifying the CLOE conda environment
+*  ```readthedocs.yml```: Read the Docs configuration file
 *  ```example_mcmc_script_for_cluster.sh```: example shell script for submitting jobs on a computing cluster
 *  ```run_cloe.py```: top level script for running the CLOE user interface
 *  ```setup.py```: top level script for installing or testing CLOE
+*  ```Dockerfile```: CLOE Docker image
+*  ```CONTRIBUTING.md```: CLOE contribution guidelines
 *  ```LICENSE```: file containing the LGPL license of CLOE
-
 
 ## Unit and verification tests
 
