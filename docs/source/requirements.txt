@@ -6,5 +6,3 @@ docutils
 sphinx_rtd_theme
 numpydoc
 cosmosis
--e ../..
-
