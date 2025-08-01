@@ -320,8 +320,8 @@ class Spectro:
         stored as class attribute.
 
         .. math::
-            P_{\ell}^{\rm obs}(k) = \int {\rm d}k^'\,{k^'}^2\,\sum_{\ell^'} \
-            W_{\ell\ell^'}(k,k^')P_{\ell^'}(k^')
+            P_{\ell}^{\rm obs}(k) = \int {\rm d}k'\,{k'}^2\,\sum_{\ell'} \
+            W_{\ell\ell'}(k,k')P_{\ell'}(k')
 
         Parameters
         ----------
@@ -549,9 +549,9 @@ class Spectro:
         value of redshift :math:`z` and multipole :math:`\ell`.
 
         .. math::
-            \xi_{\ell}^{g\mu}(r;z)=-C_{g\mu}(\ell) \
+            \xi_{\ell}^{g\mu}(r;z)=&-C_{g\mu}(\ell) \
             \frac{3\Omega_{m,0}{H^2_0}}{4\pi}b(z)s_{\rm bias}(z)^2 \
-            [2-5s_{\rm bias}(z)](1+z)\sum_{n=0}^{\ell/2} \
+            [2-5s_{\rm bias}(z)](1+z)  \\ & \times \sum_{n=0}^{\ell/2} \
             \frac{(-1)^n}{2^n}{\ell \choose n}{2\ell-2n \choose \ell} \
             \left(\frac{\ell}{2}-n \right)!I^{\ell/2-n+3/2}_{\ell/2-n+1/2} \
             (r;z)\\
