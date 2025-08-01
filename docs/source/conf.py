@@ -73,7 +73,6 @@ autodoc_mock_imports = [
     "pandas",
     "seaborn",
     "tensorflow",
-    "cosmosis.datablock",
 ]
 
 # Make sure the target is unique
