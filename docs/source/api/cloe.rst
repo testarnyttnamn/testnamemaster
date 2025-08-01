@@ -20,9 +20,5 @@ cloe package
    cloe.spectroscopic_survey
    cloe.tests
    cloe.user_interface
-
-.. toctree::
-   :maxdepth: 1
-
    cosmosis_integration
 
