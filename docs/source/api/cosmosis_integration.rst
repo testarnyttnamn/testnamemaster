@@ -2,7 +2,7 @@ cosmosis integration
 ====================
 
 .. autosummary::
-   :toctree: cosmosis
+   :toctree: cosmosis_integration
    :recursive:
 
    cosmosis.cosmosis_interface
