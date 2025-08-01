@@ -74,7 +74,6 @@ autodoc_mock_imports = [
     "seaborn",
     "tensorflow",
     "cosmosis.datablock",
-    "cosmosis",
 ]
 
 # Make sure the target is unique
