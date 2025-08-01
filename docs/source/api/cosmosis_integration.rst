@@ -3,7 +3,7 @@ cosmosis integration
 
 .. autosummary::
    :toctree: cosmosis_integration
-   :recursive:
+   :maxdepth: 2
 
    cosmosis.cosmosis_interface
    cosmosis.cosmosis_with_cobaya_interface
