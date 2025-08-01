@@ -48,7 +48,6 @@ extensions = [
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
-    'sphinx.ext.intersphinx',
     'sphinx.ext.autosectionlabel',
     'numpydoc'
 ]
@@ -76,9 +75,6 @@ autodoc_mock_imports = [
     "tensorflow",
     "cosmosis",
     "cosmosis.datablock",
-    "cosmosis.cosmosis_interface",
-    "cosmosis.cosmosis_with_cobaya_interface",
-    "cosmosis.camb_interface",
 ]
 
 # Make sure the target is unique
