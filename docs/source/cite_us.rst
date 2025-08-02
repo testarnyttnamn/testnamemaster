@@ -2,7 +2,7 @@ Citing CLOE
 ===========
 
 CLOE is released by the Euclid Consortium. It is open source and available under terms consistent with our 
-|link-to-license| based on `LGPL <https://www.gnu.org/licenses/lgpl-3.0>`_.
+|link-to-license| based on LGPL (https://www.gnu.org/licenses/lgpl-3.0).
 
 .. note::
 
