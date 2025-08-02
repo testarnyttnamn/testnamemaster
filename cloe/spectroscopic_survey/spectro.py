@@ -396,7 +396,7 @@ class Spectro:
         xi_mu_mu: numpy.ndarray of float
             Array of shape len(r_xi), containing the values
             of the magnification-magnification correlation function
-            evaluated at the :math:`\ell` and :math:`r_\xi` values provided
+            evaluated at the :math:`\ell` and :math:`r_\xi` values provided.
         """
         # Retrieve magnification bias value corresponding to redshift bin
         spec_zs = [1.0, 1.2, 1.4, 1.65]
