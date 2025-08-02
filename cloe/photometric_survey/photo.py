@@ -430,7 +430,7 @@ class Photo:
         *args: list
             Extra arguments of variable length, corresponding to the indices
             of the photometric bins for which the RSD kernel has to be
-            computed (2 for GCphot and 1 for XCphot)
+            computed (2 for GCphot and 1 for XCphot).
 
         Returns
         -------
