@@ -570,7 +570,7 @@ class Spectro:
         xi_dens_mu: numpy.ndarray of float
             Array of shape len(r_xi), containing the values of the
             density-magnification bias correlation function evaluated at the
-            given :math:`\ell` and :math:`r_\xi` values
+            given :math:`\ell` and :math:`r_\xi` values.
         """
         # Retrieve galaxy and magnification bias corresponding to the redshift
         spec_zs = [1.0, 1.2, 1.4, 1.65]
