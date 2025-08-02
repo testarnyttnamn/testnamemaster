@@ -654,7 +654,7 @@ class EuclidLikelihood(Likelihood):
         ----------
         **params_values: tuple
               List of (sampled) parameters obtained from
-              the theory code or asked by the likelihood
+              the theory code or asked by the likelihood.
         Returns
         -------
         Likelihood: float
